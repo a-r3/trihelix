@@ -1,14 +1,12 @@
-name: trihelix-release
+name: release
 
 on:
   workflow_dispatch:
     inputs:
       version:
-        description: 'Version to release (e.g., v0.1.0)'
+        description: "Version tag (e.g. v1.2.3)"
         required: true
-  push:
-    tags:
-      - 'v*.*.*'
+  pull_request:
 
 permissions:
   contents: write
@@ -24,109 +22,54 @@ jobs:
       - name: Install deps
         run: sudo apt-get update && sudo apt-get install -y python3
 
-      - name: Generate release notes
-        run: |
-          python3 scripts/changelog.py
-          ver="${{ github.event_name == 'workflow_dispatch' && github.event.inputs.version || github.ref_name }}"
-          repo="${GITHUB_REPOSITORY}"
-          compare_url="https://github.com/${repo}/compare/$(git describe --tags --abbrev=0 --tags --match 'v*' 2>/dev/null || echo v0.0.0)...${ver}"
-          echo "# TriHelix ${ver}"            >  docs/RELEASE_BODY.md
-          echo >> docs/RELEASE_BODY.md
-          echo "## Summary" >> docs/RELEASE_BODY.md
-          cat docs/RELEASE_NOTES.md >> docs/RELEASE_BODY.md
-          echo >> docs/RELEASE_BODY.md
-          echo "## Changelog" >> docs/RELEASE_BODY.md
-          cat docs/CHANGELOG.md >> docs/RELEASE_BODY.md
-          echo >> docs/RELEASE_BODY.md
-          echo "## Links" >> docs/RELEASE_BODY.md
-          echo "- Compare: ${compare_url}" >> docs/RELEASE_BODY.md
-          echo "- Repo: https://github.com/${repo}" >> docs/RELEASE_BODY.md
-          chmod +x scripts/release-notes.py || true
-          python3 scripts/release-notes.py
-
-      - name: Commit notes if changed
-        run: |
-          git config user.name "helix-bot"
-          git config user.email "helix-bot@users.noreply.github.com"
-          git add docs/RELEASE_NOTES.md CONTEXT.yaml || true
-          git diff --cached --quiet || git commit -m "chore(release): update notes/context"
-
-      # Only when dispatch: create tag here
-      - name: Build release body
+      # Hər ikisində (PR və dispatch) təhlükəsiz generasiya: hec nə push/tag etmir
+      - name: Generate notes & changelog (safe)
         run: |
           set -e
-          mkdir -p docs
-          chmod +x scripts/release-notes.py || true
-          python3 scripts/release-notes.py || true   # → docs/RELEASE_NOTES.md
-          python3 scripts/changelog.py || true       # → docs/CHANGELOG.md
-          ver="${{ github.event_name == 'workflow_dispatch' && github.event.inputs.version || github.ref_name }}"
+          chmod +x scripts/changelog.py scripts/release-notes.py || true
+
+          # versiyanı kontekstdən götür: dispatch-də input, PR-da isə son tag + "-pr"
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            ver="${{ github.event.inputs.version }}"
+          else
+            last="$(git describe --tags --abbrev=0 --tags --match 'v*' 2>/dev/null || echo v0.0.0)"
+            ver="${last}-pr"
+          fi
+
           repo="${GITHUB_REPOSITORY}"
-          last="$(git describe --tags --abbrev=0 --match 'v*' 2>/dev/null || echo v0.0.0)"
-          compare_url="https://github.com/${repo}/compare/${last}...${ver}"
-          {
-            echo "# TriHelix ${ver}"
-            echo
-            echo "## Summary"
-            test -f docs/RELEASE_NOTES.md && cat docs/RELEASE_NOTES.md || echo "(no RELEASE_NOTES.md)"
-            echo
-            echo "## Changelog"
-            test -f docs/CHANGELOG.md && cat docs/CHANGELOG.md || echo "(no CHANGELOG.md)"
-            echo
-            echo "## Links"
-            echo "- Compare: ${compare_url}"
-            echo "- Repo: https://github.com/${repo}"
-          } > docs/RELEASE_BODY.md
-      - name: Create tag (workflow_dispatch only)
+          compare_url="https://github.com/${repo}/compare/$(git describe --tags --abbrev=0 --tags --match 'v*' 2>/dev/null || echo v0.0.0)...${ver}"
+
+          # changelog + notes
+          python3 scripts/changelog.py
+          python3 scripts/release-notes.py || true   # skript yoxdursa uğursuz etməsin
+
+          # release body
+          echo "# TriHelix ${ver}"            >  docs/RELEASE_BODY.md
+          echo >> docs/RELEASE_BODY.md
+          echo "## Summary"                   >> docs/RELEASE_BODY.md
+          [ -f docs/RELEASE_NOTES.md ] && cat docs/RELEASE_NOTES.md >> docs/RELEASE_BODY.md || echo "(no notes)" >> docs/RELEASE_BODY.md
+          echo >> docs/RELEASE_BODY.md
+          echo "## Changelog"                 >> docs/RELEASE_BODY.md
+          [ -f docs/CHANGELOG.md ] && cat docs/CHANGELOG.md >> docs/RELEASE_BODY.md || echo "(no changelog)" >> docs/RELEASE_BODY.md
+          echo >> docs/RELEASE_BODY.md
+          echo "## Links"                     >> docs/RELEASE_BODY.md
+          echo "- Compare: ${compare_url}"    >> docs/RELEASE_BODY.md
+          echo "- Repo: https://github.com/${repo}" >> docs/RELEASE_BODY.md
+
+      # Aşağıdakı iki addım YALNIZ manual dispatch zamanı işləyir
+      - name: Create tag
         if: ${{ github.event_name == 'workflow_dispatch' }}
         run: |
+          set -e
           ver="${{ github.event.inputs.version }}"
           git tag -a "$ver" -m "TriHelix $ver"
           git push origin "$ver"
 
-      # Release for workflow_dispatch (use input version)
-      - name: Create GitHub Release (dispatch)
+      - name: Create GitHub Release
         if: ${{ github.event_name == 'workflow_dispatch' }}
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.event.inputs.version }}
           name: TriHelix ${{ github.event.inputs.version }}
           body_path: docs/RELEASE_BODY.md
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      # Release for tag push (use ref tag)
-      - name: Create GitHub Release (tag push)
-        if: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') }}
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ github.ref_name }}
-          name: TriHelix ${{ github.ref_name }}
-          body_path: docs/RELEASE_BODY.md
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Build release body
-        run: |
-          python3 scripts/changelog.py
-          ver="${{ github.event_name == 'workflow_dispatch' && github.event.inputs.version || github.ref_name }}"
-          repo="${GITHUB_REPOSITORY}"
-          compare_url="https://github.com/${repo}/compare/$(git describe --tags --abbrev=0 --tags --match 'v*' 2>/dev/null || echo v0.0.0)...${ver}"
-          echo "# TriHelix ${ver}"            >  docs/RELEASE_BODY.md
-          echo ""                            >> docs/RELEASE_BODY.md
-          echo "## Summary"                  >> docs/RELEASE_BODY.md
-          cat docs/RELEASE_NOTES.md         >> docs/RELEASE_BODY.md
-          echo ""                            >> docs/RELEASE_BODY.md
-          echo "## Changelog"                >> docs/RELEASE_BODY.md
-          cat docs/CHANGELOG.md             >> docs/RELEASE_BODY.md
-          echo ""                            >> docs/RELEASE_BODY.md
-          echo "## Links"                    >> docs/RELEASE_BODY.md
-          echo "- Compare: ${compare_url}"   >> docs/RELEASE_BODY.md
-          echo "- Repo: https://github.com/${repo}" >> docs/RELEASE_BODY.md
-
-      - name: Attach health & metrics (optional)
-        run: |
-          {
-            echo ""; echo "## Health & Metrics";
-            echo ""; echo '```json'
-            jq -n --slurpfile h .helix/health.json --slurpfile m .helix/metrics.json '{health:$h[0],metrics:$m[0]}' || echo '{"health":null,"metrics":null}'
-            echo '```'
-          } >> docs/RELEASE_BODY.md
+          overwrite_files: true
