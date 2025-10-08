@@ -1,0 +1,2 @@
+- Initial auto notes placeholder.
+- Add highlights for this release here.
