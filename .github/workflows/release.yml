@@ -25,14 +25,14 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y python3
 
-      # <— MƏCBURİ: notes/changelog yoxdursa yaratsın, CI heç vaxt düşməsin
-      - name: Ensure docs stubs (never fail on missing files)
+      # --- MÜTLƏQ: notes/changelog yoxdursa yarat ---
+      - name: Ensure docs stubs (never fail)
         run: |
           mkdir -p docs
           test -f docs/RELEASE_NOTES.md || echo "No manual notes for this release." > docs/RELEASE_NOTES.md
           test -f docs/CHANGELOG.md    || echo "# Changelog" > docs/CHANGELOG.md
 
-      - name: Generate release body (notes + changelog + links)
+      - name: Generate release body
         shell: bash
         run: |
           set -euo pipefail
@@ -73,13 +73,11 @@ jobs:
             docs/EVAL_SUMMARY.json
           if-no-files-found: ignore
 
-      - name: Create tag & GitHub Release
+      - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.event.inputs.version }}
           name: TriHelix ${{ github.event.inputs.version }}
           body_path: docs/RELEASE_BODY.md
-          draft: false
-          prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
