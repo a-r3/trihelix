@@ -22,13 +22,11 @@ jobs:
       - name: Install deps
         run: sudo apt-get update && sudo apt-get install -y python3
 
-      # Hər ikisində (PR və dispatch) təhlükəsiz generasiya: hec nə push/tag etmir
       - name: Generate notes & changelog (safe)
         run: |
           set -e
           chmod +x scripts/changelog.py scripts/release-notes.py || true
 
-          # versiyanı kontekstdən götür: dispatch-də input, PR-da isə son tag + "-pr"
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             ver="${{ github.event.inputs.version }}"
           else
@@ -39,11 +37,9 @@ jobs:
           repo="${GITHUB_REPOSITORY}"
           compare_url="https://github.com/${repo}/compare/$(git describe --tags --abbrev=0 --tags --match 'v*' 2>/dev/null || echo v0.0.0)...${ver}"
 
-          # changelog + notes
           python3 scripts/changelog.py
-          python3 scripts/release-notes.py || true   # skript yoxdursa uğursuz etməsin
+          python3 scripts/release-notes.py || true
 
-          # release body
           echo "# TriHelix ${ver}"            >  docs/RELEASE_BODY.md
           echo >> docs/RELEASE_BODY.md
           echo "## Summary"                   >> docs/RELEASE_BODY.md
@@ -56,7 +52,6 @@ jobs:
           echo "- Compare: ${compare_url}"    >> docs/RELEASE_BODY.md
           echo "- Repo: https://github.com/${repo}" >> docs/RELEASE_BODY.md
 
-      # Aşağıdakı iki addım YALNIZ manual dispatch zamanı işləyir
       - name: Create tag
         if: ${{ github.event_name == 'workflow_dispatch' }}
         run: |
