@@ -143,3 +143,8 @@
 - [ ] module tests
 - [ ] coverage +5%
 
+## 2025-10-08T08:10:53+04:00 — HARDEN plan
+- [ ] policy guard hardening
+- [ ] module tests
+- [ ] coverage +5%
+

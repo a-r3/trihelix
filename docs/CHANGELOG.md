@@ -2,6 +2,8 @@
 
 Initial changelog:
 
+- f6add38 chore(test): trigger bot PR (Rauf)
+- dfcee26 chore(release): bump & changelog (Rauf)
 - 4fc848c chore(ops): auto-merge, scheduled loop, semver, changelog, rich notify (Rauf)
 - 629a6b5 chore(ci): re-run after checkout+base fix (Rauf)
 - 726b893 fix(ci): checkout ref=main and PR base=main (avoid heads/main ambiguity) (Rauf)
