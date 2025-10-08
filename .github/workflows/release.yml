@@ -23,60 +23,72 @@ jobs:
       - name: Install deps
         run: sudo apt-get update && sudo apt-get install -y python3
 
-      - name: Generate release notes & changelog (safe)
+      - name: Ensure docs stubs (avoid missing-file failures)
+        run: |
+          mkdir -p docs
+          test -f docs/RELEASE_NOTES.md || echo "No additional notes." > docs/RELEASE_NOTES.md
+          test -f docs/CHANGELOG.md    || echo "- Initial." > docs/CHANGELOG.md
+
+      - name: Generate notes & changelog
         shell: bash
         run: |
           set -euo pipefail
-          mkdir -p docs
-
-          # RELEASE_NOTES.md yoxdursa stub yarat
-          if [[ ! -f docs/RELEASE_NOTES.md ]]; then
-            echo "Initial notes. Will be curated in future releases." > docs/RELEASE_NOTES.md
-          fi
-
-          # CHANGES (mövcuddursa) qur
-          if [[ -f scripts/changelog.py ]]; then
-            python3 scripts/changelog.py || true
-          fi
-
-          EVENT="${GITHUB_EVENT_NAME}"
-          VER_INPUT="${{ github.event.inputs.version || '' }}"
-          if [[ "$EVENT" == "workflow_dispatch" && -n "$VER_INPUT" ]]; then
-            VER="$VER_INPUT"
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            ver="${{ inputs.version }}"
           else
-            VER="$(git describe --tags --abbrev=0 --match 'v*' 2>/dev/null || echo 'v0.0.0-PR')"
+            ver="v0.0.0"
           fi
-          LAST_TAG="$(git describe --tags --abbrev=0 --match 'v*' 2>/dev/null || echo 'v0.0.0')"
-          REPO="${GITHUB_REPOSITORY}"
+          repo="${GITHUB_REPOSITORY}"
+          base_tag="$(git describe --tags --abbrev=0 --tags --match 'v*' 2>/dev/null || echo v0.0.0)"
+          compare_url="https://github.com/${repo}/compare/${base_tag}...${ver}"
 
           {
-            echo "# TriHelix ${VER}"
+            echo "# TriHelix ${ver}"
             echo
             echo "## Summary"
-            cat docs/RELEASE_NOTES.md 2>/dev/null || echo "TBD"
+            cat docs/RELEASE_NOTES.md
             echo
             echo "## Changelog"
-            cat docs/CHANGELOG.md 2>/dev/null || echo "*No CHANGELOG yet*"
+            cat docs/CHANGELOG.md
             echo
             echo "## Links"
-            echo "- Compare: https://github.com/${REPO}/compare/${LAST_TAG}...${VER}"
-            echo "- Repo: https://github.com/${REPO}"
+            echo "- Compare: ${compare_url}"
+            echo "- Repo: https://github.com/${repo}"
           } > docs/RELEASE_BODY.md
 
-      - name: Create tag (dispatch only)
-        if: ${{ github.event_name == 'workflow_dispatch' }}
-        shell: bash
+      - name: Aggregate evaluation plans
         run: |
-          set -euo pipefail
-          git config user.name  "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git tag -f "${{ inputs.version }}"
-          git push -f origin "refs/tags/${{ inputs.version }}"
+          python3 scripts/eval_aggregate.py
+          if test -f docs/EVAL_SUMMARY.md; then
+            {
+              echo
+              echo "## Evaluation Summary"
+              cat docs/EVAL_SUMMARY.md
+            } >> docs/RELEASE_BODY.md
+          fi
+
+      - name: Upload evaluation artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: eval-summary
+          path: |
+            docs/EVAL_SUMMARY.md
+            docs/EVAL_SUMMARY.json
+
+      - name: Create tag (dispatch only)
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          ver="${{ inputs.version }}"
+          git tag -a "${ver}" -m "Release ${ver}"
+          git push origin "${ver}"
 
       - name: Create GitHub Release (dispatch)
-        if: ${{ github.event_name == 'workflow_dispatch' }}
+        if: github.event_name == 'workflow_dispatch'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name:   ${{ inputs.version }}
-          body_path:  docs/RELEASE_BODY.md
-          make_latest: true
+          tag_name: ${{ inputs.version }}
+          name: TriHelix ${{ inputs.version }}
+          body_path: docs/RELEASE_BODY.md
+          draft: false
+          prerelease: false
