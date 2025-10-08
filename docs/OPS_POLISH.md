@@ -16,3 +16,4 @@ git add -A && git commit -m "chore(release): bump & changelog" && git push
 # release
 gh workflow run trihelix-release -f version=v$(awk '/^version:/{print $2;exit}' CONTEXT.yaml)
 ```
+# test

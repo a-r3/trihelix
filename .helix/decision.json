@@ -1,5 +1,5 @@
 {
-  "ts": "2025-10-08T04:02:50Z",
+  "ts": "2025-10-08T04:08:52Z",
   "decision": {
     "action": "harden",
     "goals": [
@@ -10,16 +10,16 @@
   },
   "inputs": {
     "health": {
-      "ts": "2025-10-08T08:02:50+04:00",
+      "ts": "2025-10-08T08:08:52+04:00",
       "status": "ok",
       "risk": "low",
       "score": 100
     },
     "insights": {
-      "ts": "2025-10-08T08:02:50.058594",
-      "loops_total": 32,
-      "loops_ok": 32,
-      "last_finished_at": "2025-10-08T08:00:49+04:00",
+      "ts": "2025-10-08T08:08:52.363664",
+      "loops_total": 35,
+      "loops_ok": 35,
+      "last_finished_at": "2025-10-08T08:06:52+04:00",
       "health_score": 100,
       "diagno_quick_wins": [
         "keep logs append-only"
