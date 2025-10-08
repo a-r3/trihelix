@@ -1,0 +1,12 @@
+.helix/
+.helix/**
+
+modules/**/out/
+modules/**/reports/
+modules/**/diff.json
+
+logs/
+**/loop-*.json
+
+# local scratch
+code/HELLO.txt
