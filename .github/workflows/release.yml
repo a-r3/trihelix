@@ -26,6 +26,21 @@ jobs:
 
       - name: Generate release notes
         run: |
+          python3 scripts/changelog.py
+          ver="${{ github.event_name == 'workflow_dispatch' && github.event.inputs.version || github.ref_name }}"
+          repo="${GITHUB_REPOSITORY}"
+          compare_url="https://github.com/${repo}/compare/$(git describe --tags --abbrev=0 --tags --match 'v*' 2>/dev/null || echo v0.0.0)...${ver}"
+          echo "# TriHelix ${ver}"            >  docs/RELEASE_BODY.md
+          echo >> docs/RELEASE_BODY.md
+          echo "## Summary" >> docs/RELEASE_BODY.md
+          cat docs/RELEASE_NOTES.md >> docs/RELEASE_BODY.md
+          echo >> docs/RELEASE_BODY.md
+          echo "## Changelog" >> docs/RELEASE_BODY.md
+          cat docs/CHANGELOG.md >> docs/RELEASE_BODY.md
+          echo >> docs/RELEASE_BODY.md
+          echo "## Links" >> docs/RELEASE_BODY.md
+          echo "- Compare: ${compare_url}" >> docs/RELEASE_BODY.md
+          echo "- Repo: https://github.com/${repo}" >> docs/RELEASE_BODY.md
           chmod +x scripts/release-notes.py || true
           python3 scripts/release-notes.py
 
