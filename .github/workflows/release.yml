@@ -29,17 +29,16 @@ jobs:
           set -euo pipefail
           mkdir -p docs
 
-          # Curated notes stub (prevent 'cat: not found')
+          # RELEASE_NOTES.md yoxdursa stub yarat
           if [[ ! -f docs/RELEASE_NOTES.md ]]; then
             echo "Initial notes. Will be curated in future releases." > docs/RELEASE_NOTES.md
           fi
 
-          # Try to build CHANGELOG if script exists
+          # CHANGES (mövcuddursa) qur
           if [[ -f scripts/changelog.py ]]; then
             python3 scripts/changelog.py || true
           fi
 
-          # Figure out version and compare range robustly
           EVENT="${GITHUB_EVENT_NAME}"
           VER_INPUT="${{ github.event.inputs.version || '' }}"
           if [[ "$EVENT" == "workflow_dispatch" && -n "$VER_INPUT" ]]; then
@@ -50,7 +49,6 @@ jobs:
           LAST_TAG="$(git describe --tags --abbrev=0 --match 'v*' 2>/dev/null || echo 'v0.0.0')"
           REPO="${GITHUB_REPOSITORY}"
 
-          # Build body (never fail on missing files)
           {
             echo "# TriHelix ${VER}"
             echo
@@ -69,16 +67,16 @@ jobs:
         if: ${{ github.event_name == 'workflow_dispatch' }}
         shell: bash
         run: |
-            set -euo pipefail
-            git config user.name  "github-actions[bot]"
-            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git tag -f "${{ inputs.version }}"
-            git push -f origin "refs/tags/${{ inputs.version }}"
+          set -euo pipefail
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag -f "${{ inputs.version }}"
+          git push -f origin "refs/tags/${{ inputs.version }}"
 
       - name: Create GitHub Release (dispatch)
         if: ${{ github.event_name == 'workflow_dispatch' }}
         uses: softprops/action-gh-release@v2
         with:
-          tag_name:  ${{ inputs.version }}
-          body_path: docs/RELEASE_BODY.md
+          tag_name:   ${{ inputs.version }}
+          body_path:  docs/RELEASE_BODY.md
           make_latest: true
