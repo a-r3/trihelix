@@ -43,6 +43,7 @@ jobs:
         if: env.CHANGES == 'true'
         uses: peter-evans/create-pull-request@v6
         with:
+          base: main
           commit-message: "chore(ci): loop telemetry & docs update"
           title: "Helix Bot: update telemetry & docs"
           body: |
