@@ -5,3 +5,15 @@ run-*-logs.zip
 modules/*/out/
 repo_snapshot.txt
 run-*-logs.zip
+.helix/**
+
+modules/**/out/
+modules/**/reports/
+modules/**/diff.json
+
+logs/
+**/loop-*.json
+
+# local scratch
+code/HELLO.txt
+
