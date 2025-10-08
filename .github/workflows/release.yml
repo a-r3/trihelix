@@ -51,7 +51,7 @@ jobs:
         with:
           tag_name: ${{ github.event.inputs.version }}
           name: TriHelix ${{ github.event.inputs.version }}
-          body_path: docs/RELEASE_NOTES.md
+          body_path: docs/RELEASE_BODY.md
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -62,6 +62,32 @@ jobs:
         with:
           tag_name: ${{ github.ref_name }}
           name: TriHelix ${{ github.ref_name }}
-          body_path: docs/RELEASE_NOTES.md
+          body_path: docs/RELEASE_BODY.md
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build release body
+        run: |
+          python3 scripts/changelog.py
+          ver="${{ github.event_name == 'workflow_dispatch' && github.event.inputs.version || github.ref_name }}"
+          repo="${GITHUB_REPOSITORY}"
+          compare_url="https://github.com/${repo}/compare/$(git describe --tags --abbrev=0 --tags --match 'v*' 2>/dev/null || echo v0.0.0)...${ver}"
+          echo "# TriHelix ${ver}"            >  docs/RELEASE_BODY.md
+          echo ""                            >> docs/RELEASE_BODY.md
+          echo "## Summary"                  >> docs/RELEASE_BODY.md
+          cat docs/RELEASE_NOTES.md         >> docs/RELEASE_BODY.md
+          echo ""                            >> docs/RELEASE_BODY.md
+          echo "## Changelog"                >> docs/RELEASE_BODY.md
+          cat docs/CHANGELOG.md             >> docs/RELEASE_BODY.md
+          echo ""                            >> docs/RELEASE_BODY.md
+          echo "## Links"                    >> docs/RELEASE_BODY.md
+          echo "- Compare: ${compare_url}"   >> docs/RELEASE_BODY.md
+          echo "- Repo: https://github.com/${repo}" >> docs/RELEASE_BODY.md
+
+      - name: Attach health & metrics (optional)
+        run: |
+          {
+            echo ""; echo "## Health & Metrics";
+            echo ""; echo '```json'
+            jq -n --slurpfile h .helix/health.json --slurpfile m .helix/metrics.json '{health:$h[0],metrics:$m[0]}' || echo '{"health":null,"metrics":null}'
+            echo '```'
+          } >> docs/RELEASE_BODY.md
