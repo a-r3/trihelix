@@ -25,14 +25,44 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y python3
 
-      # --- MÜTLƏQ: notes/changelog yoxdursa yarat ---
+      # PR-lərdə də uğursuz olmasın deyə stub sənədləri həmişə yarat
       - name: Ensure docs stubs (never fail)
         run: |
           mkdir -p docs
           test -f docs/RELEASE_NOTES.md || echo "No manual notes for this release." > docs/RELEASE_NOTES.md
           test -f docs/CHANGELOG.md    || echo "# Changelog" > docs/CHANGELOG.md
 
+      # ---- PR-ONLY: sadəcə yoxlama, heç nə publish etmə
+      - name: PR validation (no release)
+        if: ${{ github.event_name == 'pull_request' }}
+        run: |
+          set -euo pipefail
+          echo "PR sanity:"
+          echo "- CONTEXT.yaml:"
+          test -f CONTEXT.yaml && head -n 20 CONTEXT.yaml || true
+          echo "- Build release body to ensure it renders (throwaway)"
+          repo="${GITHUB_REPOSITORY}"
+          base_tag="$(git describe --tags --abbrev=0 --match 'v*' 2>/dev/null || echo v0.0.0)"
+          ver="v0.0.0-PR"
+          compare_url="https://github.com/${repo}/compare/${base_tag}...${ver}"
+          {
+            echo "# TriHelix ${ver}"
+            echo
+            echo "## Summary"
+            cat docs/RELEASE_NOTES.md || true
+            echo
+            echo "## Changelog"
+            cat docs/CHANGELOG.md || true
+            echo
+            echo "## Links"
+            echo "- Compare: ${compare_url}"
+            echo "- Repo: https://github.com/${repo}"
+          } > docs/RELEASE_BODY.md
+          echo "OK"
+
+      # ---- DISPATCH-ONLY: real release axını
       - name: Generate release body
+        if: ${{ github.event_name == 'workflow_dispatch' }}
         shell: bash
         run: |
           set -euo pipefail
@@ -55,6 +85,7 @@ jobs:
           } > docs/RELEASE_BODY.md
 
       - name: Run evaluation aggregator (best-effort)
+        if: ${{ github.event_name == 'workflow_dispatch' }}
         run: |
           if [ -x scripts/eval_aggregate.py ]; then
             ./scripts/eval_aggregate.py || true
@@ -65,6 +96,7 @@ jobs:
           fi
 
       - name: Upload eval summary artifact
+        if: ${{ github.event_name == 'workflow_dispatch' }}
         uses: actions/upload-artifact@v4
         with:
           name: eval-summary
@@ -74,6 +106,7 @@ jobs:
           if-no-files-found: ignore
 
       - name: Create GitHub Release
+        if: ${{ github.event_name == 'workflow_dispatch' }}
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.event.inputs.version }}
