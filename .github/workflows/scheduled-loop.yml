@@ -1,0 +1,52 @@
+name: scheduled-loop
+
+on:
+  schedule:
+    - cron: '17 */6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  loop:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: main
+      - name: Install deps
+        run: sudo apt-get update && sudo apt-get install -y jq python3
+      - name: Run sync loop
+        run: |
+          chmod +x scripts/*.sh modules/*/bin/*.sh || true
+          bash scripts/loop-run.sync.sh
+      - name: Health Gate
+        env:
+          MIN_HEALTH: "75"
+        run: bash scripts/health-gate.sh
+      - name: Prepare changes
+        run: |
+          git config user.name "helix-bot"
+          git config user.email "helix-bot@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "CHANGES=false" >> $GITHUB_ENV
+          else
+            git commit -m "chore(loop): scheduled sync updates"
+            echo "CHANGES=true" >> $GITHUB_ENV
+          fi
+      - name: Create Pull Request
+        if: env.CHANGES == 'true'
+        uses: peter-evans/create-pull-request@v6
+        with:
+          base: main
+          commit-message: chore(loop): scheduled sync updates
+          title: "Helix Bot: scheduled sync updates"
+          body: |
+            Automated scheduled loop sync.
+          branch: bot/scheduled-helix-update
+          delete-branch: true
+          labels: bot, helix, automated, automerge
