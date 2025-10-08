@@ -1,0 +1,38 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "HelixState",
+  "type": "object",
+  "properties": {
+    "phase": {
+      "type": "string"
+    },
+    "iteration": {
+      "type": "integer"
+    },
+    "last_loop": {
+      "type": "object",
+      "properties": {
+        "started_at": {
+          "type": "string"
+        },
+        "finished_at": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "artifacts": {
+          "type": "object"
+        }
+      },
+      "required": [
+        "status"
+      ]
+    }
+  },
+  "required": [
+    "phase",
+    "iteration",
+    "last_loop"
+  ]
+}

@@ -1,0 +1,41 @@
+project: TriHelix
+project: TriHelix
+version: 1.0.0
+version: 1.0.0
+purpose: >
+purpose: >
+  Build an AI‑native TriHelix where Atlas (plan), Genom (create), Diagno (analyze)
+  Build an AI‑native TriHelix where Atlas (plan), Genom (create), Diagno (analyze)
+  are orchestrated by Helix to form a self‑adapting development loop.
+  are orchestrated by Helix to form a self‑adapting development loop.
+current_phase:
+  name: Conductor
+  range: 40-60
+  focus: "Full loop engine: health scoring, policy guard, adaptive roadmap"
+  focus: "Scaffold, context, memory, and first loop prototype"
+    focus: "Full loop engine: health scoring, policy guard, adaptive roadmap"
+ai_operating_rules:
+ai_operating_rules:
+  - Always load CONTEXT.yaml before reasoning.
+  - Always load CONTEXT.yaml before reasoning.
+  - Treat .helix/state.json as authoritative runtime state.
+  - Treat .helix/state.json as authoritative runtime state.
+  - After each loop, append to MEMORY.md and update .helix/memory/trihelix.snapshot.json.
+  - After each loop, append to MEMORY.md and update .helix/memory/trihelix.snapshot.json.
+  - Never delete memory or state; changes are additive and auditable.
+  - Never delete memory or state; changes are additive and auditable.
+artifacts:
+artifacts:
+  state: .helix/state.json
+  state: .helix/state.json
+  memory: .helix/memory/trihelix.snapshot.json
+  memory: .helix/memory/trihelix.snapshot.json
+  agents_dir: .helix/agents
+  agents_dir: .helix/agents
+  logs_dir: .helix/logs
+  logs_dir: .helix/logs
+last_updated: 2025-10-08
+last_updated: 2025-10-08
+maintainer: "Helix AI Agent"
+maintainer: "Helix AI Agent"
+

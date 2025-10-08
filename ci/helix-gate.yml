@@ -1,0 +1,24 @@
+name: Helix Health Gate
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  helix-gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install jq & python
+        run: sudo apt-get update && sudo apt-get install -y jq python3
+      - name: Run loop (once) + metrics
+        run: |
+          chmod +x scripts/*.sh modules/*/bin/*.sh || true
+          bash scripts/loop-run.sync.sh || true
+      - name: Health Gate
+        env:
+          MIN_HEALTH: "75"
+        run: |
+          chmod +x scripts/health-gate.sh
+          bash scripts/health-gate.sh

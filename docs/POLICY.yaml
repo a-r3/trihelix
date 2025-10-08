@@ -1,0 +1,10 @@
+rules:
+  - id: require-metrics
+    desc: Metrics must be updated after each loop
+    check:
+      file_exists: ".helix/metrics.json"
+  - id: require-health
+    desc: Health score must exist and be >=70
+    check:
+      file_exists: ".helix/health.json"
+      min_health: 70

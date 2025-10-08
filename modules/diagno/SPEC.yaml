@@ -1,0 +1,43 @@
+spec_version: 1.0.0
+module: diagno
+role: Health & Risk Analyst
+description: Scan repository health, correlate trends, and propose fixes.
+
+defaults:
+  output_format: json
+  retries: 0
+  timeout_ms: 5000
+
+io:
+  inputs:
+    - repository files
+    - ci logs (optional)
+    - telemetry (optional)
+  outputs:
+    - reports/{html,json,text}
+    - out/insights.json
+    - out/recommendations.json
+
+commands:
+
+- name: scan
+  desc: Run scanners and produce reports
+  flags:
+    - name: --format
+      type: string
+    - name: --sbom
+      type: boolean
+- name: test
+  desc: Collect test & coverage
+- name: audit
+  desc: Dependency and license audit
+- name: report
+  desc: Consolidate insights
+
+artifacts:
+  logs_dir: "./logs"
+  out_dir: "./out"
+
+contracts:
+  envelope_schema: "https://spec.trihelix.dev/envelope.schema.json"
+  state_contract: "../helix/STATE_SCHEMA.json"

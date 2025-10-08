@@ -1,0 +1,42 @@
+spec_version: 1.0.0
+module: genom
+role: Code Generator & Refactor
+description: Transform plans into code structures and CI scaffolds.
+
+defaults:
+  output_format: json
+  retries: 0
+  timeout_ms: 5000
+
+io:
+  inputs:
+    - modules/atlas/plans/plan.json
+    - modules/atlas/specs/spec.yaml
+  outputs:
+    - code/* (generated)
+    - ci/* (workflows)
+    - out/diff.json
+
+commands:
+
+- name: new
+  desc: Initialize templates and sandbox
+- name: generate
+  desc: Generate code from plan/spec
+  flags:
+    - name: --dry-run
+      type: boolean
+    - name: --pattern
+      type: string
+- name: refactor
+  desc: AST-safe refactors (rename, extract)
+- name: report
+  desc: Generation summary and diffs
+
+artifacts:
+  logs_dir: "./logs"
+  out_dir: "./out"
+
+contracts:
+  envelope_schema: "https://spec.trihelix.dev/envelope.schema.json"
+  state_contract: "../helix/STATE_SCHEMA.json"

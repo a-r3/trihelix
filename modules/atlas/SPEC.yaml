@@ -1,0 +1,43 @@
+spec_version: 1.0.0
+module: atlas
+role: Planner & Strategist
+description: Generate plans, roadmaps, specs, and guard policies.
+
+defaults:
+  output_format: json
+  retries: 0
+  timeout_ms: 5000
+
+io:
+  inputs:
+    - MEMORY.md
+    - docs/ROADMAP.md (optional)
+    - diagno: insights (optional)
+  outputs:
+    - docs/ROADMAP.md (append)
+    - plans/plan.json
+    - specs/spec.yaml
+
+commands:
+
+- name: new
+  desc: Initialize atlas workspace (plans/, specs/)
+- name: plan
+  desc: Generate roadmap and sprint plan
+  flags:
+    - name: --sprint
+      type: string
+    - name: --out
+      type: string
+- name: guard
+  desc: Lint policies and output HTML/JSON report
+- name: report
+  desc: Summarize current plan & risks
+
+artifacts:
+  logs_dir: "./logs"
+  out_dir: "./out"
+
+contracts:
+  envelope_schema: "https://spec.trihelix.dev/envelope.schema.json"
+  state_contract: "../helix/STATE_SCHEMA.json"

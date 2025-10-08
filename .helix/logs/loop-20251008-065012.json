@@ -1,0 +1,8 @@
+{
+  "status": "ok",
+  "started_at": "2025-10-08T06:50:12+04:00",
+  "finished_at": "2025-10-08T06:50:12+04:00",
+  "artifacts": {
+    "log": ".helix/logs/loop-20251008-065012.json"
+  }
+}
