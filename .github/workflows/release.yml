@@ -1,10 +1,10 @@
-name: release
+name: trihelix-release
 
 on:
   workflow_dispatch:
     inputs:
       version:
-        description: "Version tag (e.g. v1.2.3)"
+        description: "Version tag (e.g. v1.2.4)"
         required: true
   pull_request:
 
@@ -16,55 +16,69 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+        with: { fetch-depth: 0 }
 
       - name: Install deps
         run: sudo apt-get update && sudo apt-get install -y python3
 
-      - name: Generate notes & changelog (safe)
+      # 1) Hər iki halda təhlükəsiz: faylları qur, boş olanda default yaz
+      - name: Generate notes & changelog
+        run: |
+          set -euo pipefail
+          ver="${{ github.event.inputs.version || 'v0.0.0' }}"
+          repo="${GITHUB_REPOSITORY}"
+          mkdir -p docs
+          # Sənin skriptin varsa, burax; yoxdursa davam et
+          if [ -f scripts/changelog.py ]; then
+            python3 scripts/changelog.py || true
+          fi
+          # Yoxdursa, minimal RELEASE_NOTES yaz
+          test -f docs/RELEASE_NOTES.md || printf "Minor fixes and housekeeping.\n" > docs/RELEASE_NOTES.md
+          # last_tag → compare linki; tapılmazsa v0.0.0
+          last_tag="$(git describe --abbrev=0 --tags --match 'v*' 2>/dev/null || echo 'v0.0.0')"
+          compare_url="https://github.com/${repo}/compare/${last_tag}...${ver}"
+          {
+            echo "# TriHelix ${ver}"
+            echo
+            echo "## Summary"
+            cat docs/RELEASE_NOTES.md || true
+            echo
+            echo "## Changelog"
+            cat docs/CHANGELOG.md || true
+            echo
+            echo "## Links"
+            echo "- Compare: ${compare_url}"
+            echo "- Repo: https://github.com/${repo}"
+          } > docs/RELEASE_BODY.md
+
+      # 2) PR-də yalnız docs dəyişibsə commit et (branch protection rahat keçsin)
+      - name: Commit notes if changed (PR only)
+        if: ${{ github.event_name == 'pull_request' }}
         run: |
           set -e
-          chmod +x scripts/changelog.py scripts/release-notes.py || true
-
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            ver="${{ github.event.inputs.version }}"
-          else
-            last="$(git describe --tags --abbrev=0 --tags --match 'v*' 2>/dev/null || echo v0.0.0)"
-            ver="${last}-pr"
+          if ! git diff --quiet -- docs; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add docs/
+            git commit -m "chore(release): update notes/changelog/body (PR safe)"
+            git push
           fi
 
-          repo="${GITHUB_REPOSITORY}"
-          compare_url="https://github.com/${repo}/compare/$(git describe --tags --abbrev=0 --tags --match 'v*' 2>/dev/null || echo v0.0.0)...${ver}"
-
-          python3 scripts/changelog.py
-          python3 scripts/release-notes.py || true
-
-          echo "# TriHelix ${ver}"            >  docs/RELEASE_BODY.md
-          echo >> docs/RELEASE_BODY.md
-          echo "## Summary"                   >> docs/RELEASE_BODY.md
-          [ -f docs/RELEASE_NOTES.md ] && cat docs/RELEASE_NOTES.md >> docs/RELEASE_BODY.md || echo "(no notes)" >> docs/RELEASE_BODY.md
-          echo >> docs/RELEASE_BODY.md
-          echo "## Changelog"                 >> docs/RELEASE_BODY.md
-          [ -f docs/CHANGELOG.md ] && cat docs/CHANGELOG.md >> docs/RELEASE_BODY.md || echo "(no changelog)" >> docs/RELEASE_BODY.md
-          echo >> docs/RELEASE_BODY.md
-          echo "## Links"                     >> docs/RELEASE_BODY.md
-          echo "- Compare: ${compare_url}"    >> docs/RELEASE_BODY.md
-          echo "- Repo: https://github.com/${repo}" >> docs/RELEASE_BODY.md
-
-      - name: Create tag
+      # 3) Dispatch zamanı real tag yarat
+      - name: Create tag (dispatch only)
         if: ${{ github.event_name == 'workflow_dispatch' }}
         run: |
-          set -e
-          ver="${{ github.event.inputs.version }}"
-          git tag -a "$ver" -m "TriHelix $ver"
-          git push origin "$ver"
+          git tag "${{ inputs.version }}"
+          git push origin "${{ inputs.version }}"
 
-      - name: Create GitHub Release
+      # 4) Dispatch zamanı real GitHub Release yarat
+      - name: Create GitHub Release (dispatch only)
         if: ${{ github.event_name == 'workflow_dispatch' }}
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ github.event.inputs.version }}
-          name: TriHelix ${{ github.event.inputs.version }}
+          tag_name: ${{ inputs.version }}
+          name: TriHelix ${{ inputs.version }}
           body_path: docs/RELEASE_BODY.md
-          overwrite_files: true
+          generate_release_notes: false
+          draft: false
+          prerelease: false
