@@ -1,0 +1,15 @@
+- name: bot
+  color: 0e8a16
+  description: Automated changes
+- name: helix
+  color: 1d76db
+  description: Helix system updates
+- name: roadmap
+  color: bfd4f2
+  description: Roadmap & planning
+- name: diag
+  color: d93f0b
+  description: Diagnostics / risks
+- name: good first issue
+  color: 7057ff
+  description: Good entry tasks
