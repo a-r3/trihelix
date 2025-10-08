@@ -1,52 +1,50 @@
-name: scheduled-loop
-
-on:
-  schedule:
-    - cron: '17 */6 * * *'
-  workflow_dispatch:
-
-permissions:
-  contents: write
-  pull-requests: write
-
-jobs:
-  loop:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          ref: main
-      - name: Install deps
-        run: sudo apt-get update && sudo apt-get install -y jq python3
-      - name: Run sync loop
-        run: |
-          chmod +x scripts/*.sh modules/*/bin/*.sh || true
-          bash scripts/loop-run.sync.sh
-      - name: Health Gate
-        env:
-          MIN_HEALTH: "75"
-        run: bash scripts/health-gate.sh
-      - name: Prepare changes
-        run: |
-          git config user.name "helix-bot"
-          git config user.email "helix-bot@users.noreply.github.com"
-          git add -A
-          if git diff --cached --quiet; then
-            echo "CHANGES=false" >> $GITHUB_ENV
-          else
-            git commit -m "chore(loop): scheduled sync updates"
-            echo "CHANGES=true" >> $GITHUB_ENV
-          fi
-      - name: Create Pull Request
-        if: env.CHANGES == 'true'
-        uses: peter-evans/create-pull-request@v6
-        with:
-          base: main
-          commit-message: chore(loop): scheduled sync updates
-          title: "Helix Bot: scheduled sync updates"
-          body: |
-            Automated scheduled loop sync.
-          branch: bot/scheduled-helix-update
-          delete-branch: true
-          labels: bot, helix, automated, automerge
+# name: scheduled-loop
+#
+# on:
+#   schedule:
+#     - cron: "0 * * * *"   # nümunə: hər saat
+#   push:
+#     branches: [ main ]
+#   workflow_dispatch: {}    # <<<< BUNU ƏLAVƏ ET
+#
+# permissions:
+#   contents: write
+#   pull-requests: write
+#
+# jobs:
+#   scheduled:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@v4
+#         with: { fetch-depth: 0 }
+#       - name: Deps
+#         run: sudo apt-get update && sudo apt-get install -y jq python3
+#       - name: Run Helix sync loop
+#         run: |
+#           chmod +x scripts/*.sh modules/*/bin/*.sh || true
+#           bash scripts/loop-run.sync.sh
+#       - name: Health Gate
+#         env:
+#           MIN_HEALTH: 75
+#         run: bash scripts/health-gate.sh
+#       - name: Commit telemetry
+#         run: |
+#           git config user.name "helix-bot"
+#           git config user.email "helix-bot@users.noreply.github.com"
+#           git add -A
+#           if git diff --cached --quiet; then
+#             echo "No changes."
+#           else
+#             git commit -m "chore(schedule): telemetry & docs"
+#             git push
+#           fi
+#       - name: Create PR (bot)
+#         if: always()
+#         uses: peter-evans/create-pull-request@v6
+#         with:
+#           commit-message: "Helix Bot (schedule): update telemetry & docs"
+#           title: "Helix Bot (schedule): update"
+#           body: "Automated scheduled loop update."
+#           branch: bot/scheduled-helix-update
+#           delete-branch: true
+#           labels: bot,helix,automated,automerge
