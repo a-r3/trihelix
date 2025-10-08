@@ -1,5 +1,5 @@
 {
-  "ts": "2025-10-08T07:32:38+04:00",
+  "ts": "2025-10-08T03:33:46+00:00",
   "sprint": "S-20251008",
   "goals": ["sync bus prototype", "scheduler online", "metrics collector"],
   "artifacts": ["docs/METRICS.md", ".helix/metrics.json"]
