@@ -1,4 +1,10 @@
 .helix/
+repo_snapshot.txt
+run-*-logs.zip
+.helix/
+modules/*/out/
+repo_snapshot.txt
+run-*-logs.zip
 .helix/**
 
 modules/**/out/
@@ -10,3 +16,4 @@ logs/
 
 # local scratch
 code/HELLO.txt
+

@@ -1,0 +1,144 @@
++ set -Eeuo pipefail
++ export GH_PAGER=cat
++ GH_PAGER=cat
++ export PAGER=cat
++ PAGER=cat
++ export CLICOLOR_FORCE=0
++ CLICOLOR_FORCE=0
++ export TERM=xterm-256color
++ TERM=xterm-256color
+++ git rev-parse --show-toplevel
++ ROOT=/home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix
++ OUT=/home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/out
++ mkdir -p /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/out
++ INV_TXT=/home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/out/inventory.txt
++ INV_MD=/home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/out/inventory.md
++ . /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/scripts/lib.sh
+++ set -Eeuo pipefail
+++ trap restore_tty EXIT
+++ _use_color
+++ '[' -t 1 ']'
+++ return 1
+++ BOLD=
+++ DIM=
+++ RESET=
+++ RED=
+++ GREEN=
+++ YELLOW=
+++ BLUE=
+++ LOG_FILE=
++ log_init /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/out/inventory.txt
++ LOG_FILE=/home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/out/inventory.txt
++ :
++ :
+++ date +%Y-%m-%dT%H:%M:%S%z
++ section 'TriHelix Smoke (2025-10-09T04:06:30+0400)'
++ _log_write '== TriHelix Smoke (2025-10-09T04:06:30+0400) ==\n'
++ printf %b '== TriHelix Smoke (2025-10-09T04:06:30+0400) ==\n'
+== TriHelix Smoke (2025-10-09T04:06:30+0400) ==
++ '[' -n /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/out/inventory.txt ']'
++ printf %b '== TriHelix Smoke (2025-10-09T04:06:30+0400) ==\n'
++ _strip_ansi
++ sed -E 's/\x1b\[[0-9;]*m//g'
++ ok_files=1
++ for f in ".github/workflows/release.yml" "docs/RELEASE_NOTES.md" "docs/CHANGELOG.md"
++ '[' -f /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/.github/workflows/release.yml ']'
++ ok .github/workflows/release.yml
++ _log_write '✓ .github/workflows/release.yml\n'
++ printf %b '✓ .github/workflows/release.yml\n'
+✓ .github/workflows/release.yml
++ '[' -n /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/out/inventory.txt ']'
++ printf %b '✓ .github/workflows/release.yml\n'
++ _strip_ansi
++ sed -E 's/\x1b\[[0-9;]*m//g'
++ echo '- [x] .github/workflows/release.yml'
++ for f in ".github/workflows/release.yml" "docs/RELEASE_NOTES.md" "docs/CHANGELOG.md"
++ '[' -f /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/docs/RELEASE_NOTES.md ']'
++ ok docs/RELEASE_NOTES.md
++ _log_write '✓ docs/RELEASE_NOTES.md\n'
++ printf %b '✓ docs/RELEASE_NOTES.md\n'
+✓ docs/RELEASE_NOTES.md
++ '[' -n /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/out/inventory.txt ']'
++ printf %b '✓ docs/RELEASE_NOTES.md\n'
++ _strip_ansi
++ sed -E 's/\x1b\[[0-9;]*m//g'
++ echo '- [x] docs/RELEASE_NOTES.md'
++ for f in ".github/workflows/release.yml" "docs/RELEASE_NOTES.md" "docs/CHANGELOG.md"
++ '[' -f /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/docs/CHANGELOG.md ']'
++ ok docs/CHANGELOG.md
++ _log_write '✓ docs/CHANGELOG.md\n'
++ printf %b '✓ docs/CHANGELOG.md\n'
+✓ docs/CHANGELOG.md
++ '[' -n /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/out/inventory.txt ']'
++ printf %b '✓ docs/CHANGELOG.md\n'
++ _strip_ansi
++ sed -E 's/\x1b\[[0-9;]*m//g'
++ echo '- [x] docs/CHANGELOG.md'
++ hr
++ _log_write '────────────────────────────────────\n'
++ printf %b '────────────────────────────────────\n'
+────────────────────────────────────
++ '[' -n /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/out/inventory.txt ']'
++ printf %b '────────────────────────────────────\n'
++ _strip_ansi
++ sed -E 's/\x1b\[[0-9;]*m//g'
++ ver=
++ '[' -f /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/CONTEXT.yaml ']'
+++ awk '/^version:/{print $2;exit}' /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/CONTEXT.yaml
++ ver=1.2.0
++ '[' -n 1.2.0 ']'
++ ok 'CONTEXT.yaml version: 1.2.0'
++ _log_write '✓ CONTEXT.yaml version: 1.2.0\n'
++ printf %b '✓ CONTEXT.yaml version: 1.2.0\n'
+✓ CONTEXT.yaml version: 1.2.0
++ '[' -n /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/out/inventory.txt ']'
++ printf %b '✓ CONTEXT.yaml version: 1.2.0\n'
++ _strip_ansi
++ sed -E 's/\x1b\[[0-9;]*m//g'
++ printf '\nVersion: `%s`\n' 1.2.0
++ hr
++ _log_write '────────────────────────────────────\n'
++ printf %b '────────────────────────────────────\n'
+────────────────────────────────────
++ '[' -n /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/out/inventory.txt ']'
++ printf %b '────────────────────────────────────\n'
++ _strip_ansi
++ sed -E 's/\x1b\[[0-9;]*m//g'
++ command -v gh
++ gh workflow view release.yml
++ ok 'GitHub workflow release.yml əlçatandır (gh)'
++ _log_write '✓ GitHub workflow release.yml əlçatandır (gh)\n'
++ printf %b '✓ GitHub workflow release.yml əlçatandır (gh)\n'
+✓ GitHub workflow release.yml əlçatandır (gh)
++ '[' -n /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/out/inventory.txt ']'
++ printf %b '✓ GitHub workflow release.yml əlçatandır (gh)\n'
++ _strip_ansi
++ sed -E 's/\x1b\[[0-9;]*m//g'
++ hr
++ _log_write '────────────────────────────────────\n'
++ printf %b '────────────────────────────────────\n'
+────────────────────────────────────
++ '[' -n /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/out/inventory.txt ']'
++ printf %b '────────────────────────────────────\n'
++ _strip_ansi
++ sed -E 's/\x1b\[[0-9;]*m//g'
++ '[' 1 -eq 1 ']'
++ ok 'Smoke: PASS'
++ _log_write '✓ Smoke: PASS\n'
++ printf %b '✓ Smoke: PASS\n'
+✓ Smoke: PASS
++ '[' -n /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/out/inventory.txt ']'
++ printf %b '✓ Smoke: PASS\n'
++ _strip_ansi
++ sed -E 's/\x1b\[[0-9;]*m//g'
++ printf '\nResult: ✅ PASS\n'
++ info 'Detallar: /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/out/inventory.txt, /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/out/inventory.md'
++ _log_write '• Detallar: /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/out/inventory.txt, /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/out/inventory.md\n'
++ printf %b '• Detallar: /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/out/inventory.txt, /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/out/inventory.md\n'
+• Detallar: /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/out/inventory.txt, /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/out/inventory.md
++ '[' -n /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/out/inventory.txt ']'
++ printf %b '• Detallar: /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/out/inventory.txt, /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/out/inventory.md\n'
++ _strip_ansi
++ sed -E 's/\x1b\[[0-9;]*m//g'
++ restore_tty
+(B[m

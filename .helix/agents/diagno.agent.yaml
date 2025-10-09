@@ -1,5 +1,0 @@
-id: diagno-analyst
-role: "Health & Risk Analyst"
-outputs: ["Risks", "Quick wins", "Strategic fixes"]
-rules:
-  - Provide actionable, testable recommendations

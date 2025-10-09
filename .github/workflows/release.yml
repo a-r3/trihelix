@@ -4,91 +4,185 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: "Version tag (e.g. v1.2.4)"
-        required: true
+        description: "Version tag (e.g. v1.2.4). If empty on dispatch, release uses current ref."
+        required: false
+  push:
+    tags:
+      - 'v*.*.*'
   pull_request:
 
 permissions:
-  contents: write
+  contents: write      # release yaratmaq üçün
+  packages: write      # ghcr.io push üçün
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  IMAGE_NAME: ghcr.io/${{ github.repository_owner }}/trihelix
 
 jobs:
-  release:
+  docker:
+    name: Build & (maybe) Push Docker image
     runs-on: ubuntu-latest
+
+    # PR-larda push etmirik; yalnız build edir (smoke üçün faydalıdır)
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: Ensure docs stubs (never fail)
+        run: |
+          mkdir -p docs
+          test -f docs/RELEASE_NOTES.md || echo "No manual notes for this release." > docs/RELEASE_NOTES.md
+          test -f docs/CHANGELOG.md    || echo "# Changelog" > docs/CHANGELOG.md
+
+      - name: Set VERSION
+        id: ver
+        shell: bash
+        run: |
+          set -euo pipefail
+          # 1) workflow_dispatch -> inputs.version
+          ver="${{ github.event.inputs.version || '' }}"
+          # 2) push tag -> github.ref_name (e.g. v1.2.3)
+          if [[ -z "$ver" && "${{ github.ref_type }}" == "tag" ]]; then
+            ver="${{ github.ref_name }}"
+          fi
+          # 3) else fallback to short sha
+          if [[ -z "$ver" ]]; then
+            ver="v0.0.0-${GITHUB_SHA::7}"
+          fi
+          echo "VERSION=$ver" | tee -a "$GITHUB_OUTPUT"
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Docker meta (derive tags/labels)
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.IMAGE_NAME }}
+          tags: |
+            # If semver tag (starts with v), produce rich tags
+            type=raw,value=${{ steps.ver.outputs.VERSION }}
+            type=semver,pattern={{version}},value=${{ steps.ver.outputs.VERSION }}
+            type=semver,pattern={{major}}.{{minor}},value=${{ steps.ver.outputs.VERSION }}
+            type=semver,pattern={{major}},value=${{ steps.ver.outputs.VERSION }}
+            # Always also produce latest on tag or manual release runs
+            type=raw,value=latest
+          labels: |
+            org.opencontainers.image.title=trihelix
+            org.opencontainers.image.version=${{ steps.ver.outputs.VERSION }}
+            org.opencontainers.image.source=${{ github.repository }}
+
+      # Only log in on non-PR events (push tag or manual)
+      - name: Log in to GHCR
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build (and maybe push)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: linux/amd64
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Export computed version
+        run: echo "VERSION=${{ steps.ver.outputs.VERSION }}"
+
+    outputs:
+      VERSION: ${{ steps.ver.outputs.VERSION }}
+
+  release:
+    name: Create GitHub Release
+    needs: docker
+    runs-on: ubuntu-latest
+    # PR-da release etməyək, yalnız tag push və ya manual
+    if: github.event_name != 'pull_request'
+
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
           fetch-tags: true
 
-      - name: Install deps
-        run: sudo apt-get update && sudo apt-get install -y python3
-
-      - name: Ensure docs stubs (avoid missing-file failures)
+      - name: Ensure docs stubs (never fail)
         run: |
           mkdir -p docs
-          test -f docs/RELEASE_NOTES.md || echo "No additional notes." > docs/RELEASE_NOTES.md
-          test -f docs/CHANGELOG.md    || echo "- Initial." > docs/CHANGELOG.md
+          test -f docs/RELEASE_NOTES.md || echo "No manual notes for this release." > docs/RELEASE_NOTES.md
+          test -f docs/CHANGELOG.md    || echo "# Changelog" > docs/CHANGELOG.md
 
-      - name: Generate notes & changelog
+      - name: Determine tag name
+        id: tag
         shell: bash
         run: |
           set -euo pipefail
-          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
-            ver="${{ inputs.version }}"
-          else
-            ver="v0.0.0"
-          fi
-          repo="${GITHUB_REPOSITORY}"
-          base_tag="$(git describe --tags --abbrev=0 --tags --match 'v*' 2>/dev/null || echo v0.0.0)"
-          compare_url="https://github.com/${repo}/compare/${base_tag}...${ver}"
+          ver="${{ needs.docker.outputs.VERSION }}"
+          # strip refs if any (safety)
+          ver="${ver##refs/tags/}"
+          echo "TAG=$ver" | tee -a "$GITHUB_OUTPUT"
 
+      # (opsional) Əgər workflow_dispatch verildi və tag repo-da yoxdursa — yaradıb push edək
+      - name: Create tag if missing
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="${{ steps.tag.outputs.TAG }}"
+          if ! git rev-parse -q --verify "refs/tags/$tag" >/dev/null; then
+            git tag -a "$tag" -m "TriHelix $tag"
+            git push origin "$tag"
+          fi
+
+      - name: Build release body
+        shell: bash
+        run: |
+          set -euo pipefail
+          ver="${{ steps.tag.outputs.TAG }}"
+          repo="${GITHUB_REPOSITORY}"
+          base_tag="$(git describe --tags --abbrev=0 --match 'v*' 2>/dev/null || echo v0.0.0)"
+          compare_url="https://github.com/${repo}/compare/${base_tag}...${ver}"
           {
             echo "# TriHelix ${ver}"
             echo
             echo "## Summary"
-            cat docs/RELEASE_NOTES.md
+            cat docs/RELEASE_NOTES.md || true
             echo
             echo "## Changelog"
-            cat docs/CHANGELOG.md
+            cat docs/CHANGELOG.md || true
+            echo
+            echo "## Container"
+            echo "- Image: ${{ env.IMAGE_NAME }}:${ver}"
+            echo "- Latest: ${{ env.IMAGE_NAME }}:latest"
             echo
             echo "## Links"
             echo "- Compare: ${compare_url}"
             echo "- Repo: https://github.com/${repo}"
           } > docs/RELEASE_BODY.md
 
-      - name: Aggregate evaluation plans
-        run: |
-          python3 scripts/eval_aggregate.py
-          if test -f docs/EVAL_SUMMARY.md; then
-            {
-              echo
-              echo "## Evaluation Summary"
-              cat docs/EVAL_SUMMARY.md
-            } >> docs/RELEASE_BODY.md
-          fi
-
-      - name: Upload evaluation artifacts
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: eval-summary
-          path: |
-            docs/EVAL_SUMMARY.md
-            docs/EVAL_SUMMARY.json
-
-      - name: Create tag (dispatch only)
-        if: github.event_name == 'workflow_dispatch'
-        run: |
-          ver="${{ inputs.version }}"
-          git tag -a "${ver}" -m "Release ${ver}"
-          git push origin "${ver}"
-
-      - name: Create GitHub Release (dispatch)
-        if: github.event_name == 'workflow_dispatch'
+      - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ inputs.version }}
-          name: TriHelix ${{ inputs.version }}
+          tag_name: ${{ steps.tag.outputs.TAG }}
+          name: TriHelix ${{ steps.tag.outputs.TAG }}
           body_path: docs/RELEASE_BODY.md
+          files: |
+            docs/RELEASE_NOTES.md
+            docs/CHANGELOG.md
           draft: false
           prerelease: false
+
