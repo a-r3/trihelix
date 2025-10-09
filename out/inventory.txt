@@ -1,0 +1,11 @@
+== TriHelix Smoke (2025-10-09T04:06:30+0400) ==
+✓ .github/workflows/release.yml
+✓ docs/RELEASE_NOTES.md
+✓ docs/CHANGELOG.md
+────────────────────────────────────
+✓ CONTEXT.yaml version: 1.2.0
+────────────────────────────────────
+✓ GitHub workflow release.yml əlçatandır (gh)
+────────────────────────────────────
+✓ Smoke: PASS
+• Detallar: /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/out/inventory.txt, /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/out/inventory.md

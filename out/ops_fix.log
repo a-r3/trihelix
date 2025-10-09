@@ -1,0 +1,2 @@
+== preflight ==
++ git stash push -u -m 'wip:auto-stash before trihelix-fix-ops-safe'
