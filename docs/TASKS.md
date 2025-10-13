@@ -393,3 +393,111 @@
 - [ ] module tests
 - [ ] coverage +5%
 
+## 2025-10-13T11:01:33+04:00 — HARDEN plan
+- [ ] policy guard hardening
+- [ ] module tests
+- [ ] coverage +5%
+
+## 2025-10-13T11:05:18+04:00 — HARDEN plan
+- [ ] policy guard hardening
+- [ ] module tests
+- [ ] coverage +5%
+
+<!-- BEGIN:EP_IMPORT -->
+### EP Import @ 2025-10-13T11:55:19.249538 (S-20251013)
+- [ ] (Roadmap) Context bus (events)
+- [ ] (Roadmap) Scheduler & retries
+- [ ] (Roadmap) Metrics collection
+
+<details><summary>parser meta</summary>
+- EP[Helix]: 0
+- EP[Atlas]: 0
+- EP[Genom]: 0
+- EP[Diagno]: 0
+- ROADMAP.sections: 5
+- ROADMAP.phase_candidates: 1
+- ROADMAP.items_for_phase: 3
+</details>
+<!-- END:EP_IMPORT -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## 2025-10-13T11:12:49+04:00 — HARDEN plan
+- [ ] policy guard hardening
+- [ ] module tests
+- [ ] coverage +5%
+
+## 2025-10-13T11:12:49+04:00 — HARDEN plan
+- [ ] policy guard hardening
+- [ ] module tests
+- [ ] coverage +5%
+
+## 2025-10-13T11:15:18+04:00 — HARDEN plan
+- [ ] policy guard hardening
+- [ ] module tests
+- [ ] coverage +5%
+
+## 2025-10-13T11:20:46+04:00 — HARDEN plan
+- [ ] policy guard hardening
+- [ ] module tests
+- [ ] coverage +5%
+
+## 2025-10-13T11:20:47+04:00 — HARDEN plan
+- [ ] policy guard hardening
+- [ ] module tests
+- [ ] coverage +5%
+
+## 2025-10-13T11:25:18+04:00 — HARDEN plan
+- [ ] policy guard hardening
+- [ ] module tests
+- [ ] coverage +5%
+
+## 2025-10-13T11:25:59+04:00 — HARDEN plan
+- [ ] policy guard hardening
+- [ ] module tests
+- [ ] coverage +5%
+
+## 2025-10-13T11:25:59+04:00 — HARDEN plan
+- [ ] policy guard hardening
+- [ ] module tests
+- [ ] coverage +5%
+
+## 2025-10-13T11:28:43+04:00 — HARDEN plan
+- [ ] policy guard hardening
+- [ ] module tests
+- [ ] coverage +5%
+
+## 2025-10-13T11:35:18+04:00 — HARDEN plan
+- [ ] policy guard hardening
+- [ ] module tests
+- [ ] coverage +5%
+
+
+
+
+
+
+
+
+
+

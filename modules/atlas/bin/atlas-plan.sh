@@ -1,13 +1,19 @@
 #!/usr/bin/env bash
 set -euo pipefail
-OUT="modules/atlas/plans/plan.json"; mkdir -p "$(dirname "$OUT")"
+source scripts/safe-mode.sh
+
+PLAN="modules/atlas/plans/plan.json"
+mkdir -p "$(dirname "$PLAN")"
+
 ts=$(date -Iseconds)
-cat > "$OUT" <<JSON
+sprint="S-$(date +%Y%m%d)"
+cat > "$PLAN" <<JSON
 {
   "ts": "$ts",
-  "sprint": "S-$(date +%Y%m%d)",
-  "goals": ["sync bus prototype", "scheduler online", "metrics collector"],
-  "artifacts": ["docs/METRICS.md", ".helix/metrics.json"]
+  "sprint": "$sprint",
+  "goals": ["sync bus prototype", "scheduler online", "metrics collector"]
 }
 JSON
-echo "🧭 Atlas: wrote plan → $OUT"
+
+echo "✅ Atlas: wrote plan → $PLAN"
+[ "${SAFE_MODE}" = "1" ] && echo "🛡️  (Safe Mode: meta-only write allowed)"

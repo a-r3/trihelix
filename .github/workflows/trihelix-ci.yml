@@ -108,3 +108,8 @@ jobs:
           chmod +x scripts/notify-webhook.sh || true
           scripts/notify-webhook.sh "ci.complete" '{"status":"done","ref":"'"${GITHUB_REF_NAME}"'"}' || true
 
+# .github/workflows/trihelix-ci.yml
+env:
+  SAFE_MODE: "1"
+
+

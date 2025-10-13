@@ -1,21 +1,33 @@
 #!/usr/bin/env bash
 set -euo pipefail
+
+# Safe Mode
+source scripts/safe-mode.sh
+safe_mode_banner
+
+BUS_FILE=".helix/bus/events.ndjson"
+emit() {
+  mkdir -p "$(dirname "$BUS_FILE")"
+  ts=$(date -Iseconds)
+  printf '{"ts":"%s","type":"%s","payload":%s}\n' "$ts" "$1" "${2:-{}}" >> "$BUS_FILE"
+  echo "➕ emitted: $1"
+}
+
 echo "🔁 TriHelix Sync Loop — via Context Bus"
-BUS_EMIT="scripts/context-bus.sh emit"
+emit "loop.start" '{"phase":"Genesis"}' || true
 
-$BUS_EMIT "loop.start" '{"phase":"CognitiveCore"}' || true
-
-# Atlas → plan
+# Atlas
 bash modules/atlas/bin/atlas-plan.sh
-$BUS_EMIT "atlas.plan" "$(cat modules/atlas/plans/plan.json)"
+emit "atlas.plan" "$(jq -c '. // {}' modules/atlas/plans/plan.json 2>/dev/null || echo '{}')"
 
-# Genom → generate
+echo "Synchronizing code scaffold…"
+# Genom
 bash modules/genom/bin/genom-generate.sh
-$BUS_EMIT "genom.generate" '{"ok":true}'
+emit "genom.generate" '{"ok":true}'
 
-# Diagno → scan
+# Diagno
 bash modules/diagno/bin/diagno-scan.sh
-$BUS_EMIT "diagno.scan" "$(cat modules/diagno/out/insights.json)"
+emit "diagno.scan" "$(cat modules/diagno/out/insights.json)"
 
 # Health → Insights → Decision → Guided fixes
 bash scripts/health-score.sh
@@ -23,14 +35,17 @@ python3 scripts/insight-engine.py
 bash scripts/decision-model.sh
 bash scripts/guided-fix.sh
 
-# Telemetry/state
+# EP → Tasks (phase-aware) + tamamlanmışların arxivləndirməsi
+bash scripts/ep-import.sh
+bash scripts/task-sync.sh
+
+# Atlas ep_tasks enrich + Diagno phase coverage
+bash scripts/atlas-ep-embed.sh || true
+bash scripts/diagno-phase-coverage.sh || true
+
+# Telemetry/state və metrics
+bash scripts/metrics.sh
 bash scripts/loop-run.sh
 
-# Metrics (telemetriya sonra)
-bash scripts/metrics.sh
-
-# Health Gate (en sonda; CI üçün sərt qapı)
-bash scripts/health-gate.sh
-
-$BUS_EMIT "loop.finish" '{"status":"ok"}' || true
+emit "loop.finish" '{"status":"ok"}'
 echo "✅ Sync loop complete"

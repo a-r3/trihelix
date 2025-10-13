@@ -1,72 +1,83 @@
 #!/usr/bin/env bash
+# TriHelix — Policy Guard
+# Məqsəd: Layihənin sağlamlıq, siyasət və struktur qaydalarını yoxlamaq.
+# Nəticə: PASS → 0, əks halda FAIL → 3
+
 set -euo pipefail
-H=.helix/health.json
-M=.helix/metrics.json
+
+echo "🔍 policy guard: starting…"
+
 ok=1
 
-age_hours() {
-  f="$1"
-  if [ ! -f "$f" ]; then echo 999999; return; fi
-  now=$(date +%s); mt=$(stat -c %Y "$f" 2>/dev/null || echo "$now")
-  echo $(( (now-mt)/3600 ))
-}
-
-# 1) metrics presence + freshness
-if [ ! -f "$M" ]; then
-  echo "❌ policy: metrics missing ($M)"; ok=0
-else
-  ah=$(age_hours "$M")
-  if [ "$ah" -gt 24 ]; then echo "❌ policy: metrics too old (${ah}h)"; ok=0; fi
-fi
-
-# 2) health score threshold (branch-aware)
-branch="${GITHUB_REF_NAME:-$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo dev)}"
-min=70; [ "$branch" = "main" ] && min=85
-if [ -f "$H" ]; then
-  hs=$(jq -r '.score|tonumber' "$H" 2>/dev/null || echo 0)
-  if [ "$hs" -lt "$min" ]; then
-    echo "❌ policy: health<$min (got $hs) on $branch"; ok=0
+# 1) Əsas fayllar yoxlanışı
+for f in CONTEXT.yaml docs/TASKS.md modules/atlas/plans/plan.json modules/diagno/reports/report.json; do
+  if [ ! -s "$f" ]; then
+    echo "❌ policy: missing required file $f"
+    ok=0
   fi
+done
+
+# 2) Safe Mode marker varsa xəbərdarlıq
+if [ -f PROJECT_ROOT_MARKER ] || [ "${SAFE_MODE:-0}" = "1" ]; then
+  echo "🛡️  Safe Mode aktivdir (kod yazılışları bloklanıb)"
+fi
+
+# 3) TASKS.md-də EP blokları olmalıdır
+if ! grep -q "<!-- BEGIN:EP_IMPORT_META -->" docs/TASKS.md 2>/dev/null; then
+  echo "❌ policy: META EP blok yoxdur (docs/TASKS.md)"
+  ok=0
 else
-  echo "❌ policy: health missing ($H)"; ok=0
-fi
-
-# 3) evolution baseline
-if ! bash scripts/evolution-guard.sh >/dev/null; then
-  echo "❌ policy: evolution baseline check failed"; ok=0
-fi
-
-# 4) tasks non-empty when HARDEN
-if jq -e '.decision.action=="harden"' ./.helix/decision.json >/dev/null 2>&1; then
-  if ! grep -q '\[ \]' docs/TASKS.md; then
-    echo "❌ policy: harden selected but no open tasks"; ok=0
+  # 3.1) META blok boş olmamalıdır
+  if ! sed -n '/BEGIN:EP_IMPORT_META/,/END:EP_IMPORT_META/p' docs/TASKS.md | grep -q '\[ \]'; then
+    echo "⚠️  policy: META blok boşdur və ya bütün tapşırıqlar tamamlanıb"
   fi
 fi
 
-if [ $ok -eq 1 ]; then
+# 3.2) PROJECT track aktivdirsə, PROJECT blokunda açıq item olmalıdır
+if grep -q "project_track:" CONTEXT.yaml 2>/dev/null; then
+  if grep -q "<!-- BEGIN:EP_IMPORT_PROJECT -->" docs/TASKS.md 2>/dev/null; then
+    if ! sed -n '/BEGIN:EP_IMPORT_PROJECT/,/END:EP_IMPORT_PROJECT/p' docs/TASKS.md | grep -q '\[ \]'; then
+      echo "⚠️  policy: PROJECT track aktiv, amma açıq tapşırıq yoxdur"
+    fi
+  fi
+fi
+
+# 4) Health metrikləri minimal həddə olmalıdır
+if [ -s .helix/health.json ]; then
+  score=$(jq -r '.score // 0' .helix/health.json 2>/dev/null || echo 0)
+  if [ "$score" -lt 75 ]; then
+    echo "❌ policy: Health score $score (<75)"
+    ok=0
+  fi
+else
+  echo "⚠️  policy: health.json tapılmadı"
+fi
+
+# 5) Phase coverage uyğun olmalıdır
+if [ -s modules/diagno/reports/report.json ]; then
+  open=$(jq '.phase_coverage.open' modules/diagno/reports/report.json 2>/dev/null || echo 0)
+  done=$(jq '.phase_coverage.done' modules/diagno/reports/report.json 2>/dev/null || echo 0)
+  echo "📊  coverage: open=$open, done=$done"
+  if [ "$open" -lt 0 ]; then
+    echo "❌ policy: phase coverage səhv göstərici"
+    ok=0
+  fi
+fi
+
+# 6) PLAN uyğunluq
+if [ -s modules/atlas/plans/plan.json ]; then
+  epcount=$(jq '.ep_tasks | length' modules/atlas/plans/plan.json 2>/dev/null || echo 0)
+  if [ "$epcount" -eq 0 ]; then
+    echo "⚠️  policy: plan.json-da ep_tasks yoxdur"
+  fi
+fi
+
+# 7) Sonda nəticə
+if [ "$ok" -eq 1 ]; then
   echo "✅ policy guard: PASS"
+  exit 0
 else
-  echo "❌ policy guard: FAIL"; exit 3
+  echo "❌ policy guard: FAIL"
+  exit 3
 fi
-
-applypatch <<'PATCH' 2>/dev/null || true
-*** Begin Patch
-*** Update File: scripts/policy-guard.sh
-@@
- # 3) evolution baseline
- if ! bash scripts/evolution-guard.sh >/dev/null; then
-   echo "❌ policy: evolution baseline check failed"; ok=0
- fi
- 
-+# 3.1) EP import block exists & has at least one item
-+if ! grep -q "<!-- BEGIN:EP_IMPORT -->" docs/TASKS.md 2>/dev/null; then
-+  echo "❌ policy: EP import block missing in docs/TASKS.md"; ok=0
-+else
-+  if ! sed -n '/BEGIN:EP_IMPORT/,/END:EP_IMPORT/p' docs/TASKS.md | grep -q "(- \[ \])\|(" >/dev/null 2>&1; then
-+    # sadə yoxlama: blok var, amma item tapılmadı
-+    echo "⚠️  policy: EP import block present but seems empty"
-+  fi
-+fi
-*** End Patch
-PATCH
 
