@@ -48,3 +48,25 @@ if [ $ok -eq 1 ]; then
 else
   echo "❌ policy guard: FAIL"; exit 3
 fi
+
+applypatch <<'PATCH' 2>/dev/null || true
+*** Begin Patch
+*** Update File: scripts/policy-guard.sh
+@@
+ # 3) evolution baseline
+ if ! bash scripts/evolution-guard.sh >/dev/null; then
+   echo "❌ policy: evolution baseline check failed"; ok=0
+ fi
+ 
++# 3.1) EP import block exists & has at least one item
++if ! grep -q "<!-- BEGIN:EP_IMPORT -->" docs/TASKS.md 2>/dev/null; then
++  echo "❌ policy: EP import block missing in docs/TASKS.md"; ok=0
++else
++  if ! sed -n '/BEGIN:EP_IMPORT/,/END:EP_IMPORT/p' docs/TASKS.md | grep -q "(- \[ \])\|(" >/dev/null 2>&1; then
++    # sadə yoxlama: blok var, amma item tapılmadı
++    echo "⚠️  policy: EP import block present but seems empty"
++  fi
++fi
+*** End Patch
+PATCH
+
