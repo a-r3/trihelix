@@ -1,0 +1,252 @@
++ set -Eeuo pipefail
+++ git rev-parse --show-toplevel
++ ROOT=/home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix
++ OUT=/home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/out
++ mkdir -p /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/out
++ LOG=/home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/out/audit.txt
++ . /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/scripts/lib.sh
+++ set -Eeuo pipefail
+++ trap restore_tty EXIT
+++ _use_color
+++ '[' -t 1 ']'
+++ return 1
+++ BOLD=
+++ DIM=
+++ RESET=
+++ RED=
+++ GREEN=
+++ YELLOW=
+++ BLUE=
+++ LOG_FILE=
++ log_init /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/out/audit.txt
++ LOG_FILE=/home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/out/audit.txt
++ :
+++ date +%Y-%m-%dT%H:%M:%S%z
++ section 'TriHelix Repo Audit @ 2025-10-09T04:06:29+0400'
++ _log_write '== TriHelix Repo Audit @ 2025-10-09T04:06:29+0400 ==\n'
++ printf %b '== TriHelix Repo Audit @ 2025-10-09T04:06:29+0400 ==\n'
+== TriHelix Repo Audit @ 2025-10-09T04:06:29+0400 ==
++ '[' -n /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/out/audit.txt ']'
++ printf %b '== TriHelix Repo Audit @ 2025-10-09T04:06:29+0400 ==\n'
++ _strip_ansi
++ sed -E 's/\x1b\[[0-9;]*m//g'
++ info 'root: /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix'
++ _log_write '• root: /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix\n'
++ printf %b '• root: /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix\n'
+• root: /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix
++ '[' -n /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/out/audit.txt ']'
++ printf %b '• root: /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix\n'
++ _strip_ansi
++ sed -E 's/\x1b\[[0-9;]*m//g'
++ hr
++ _log_write '────────────────────────────────────\n'
++ printf %b '────────────────────────────────────\n'
+────────────────────────────────────
++ '[' -n /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/out/audit.txt ']'
++ printf %b '────────────────────────────────────\n'
++ _strip_ansi
++ sed -E 's/\x1b\[[0-9;]*m//g'
++ section 'git status'
++ _log_write '== git status ==\n'
++ printf %b '== git status ==\n'
+== git status ==
++ '[' -n /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/out/audit.txt ']'
++ printf %b '== git status ==\n'
++ _strip_ansi
++ sed -E 's/\x1b\[[0-9;]*m//g'
++ git status -sb
++ sed 's/^/  /'
+  ## ops/release-stubs...origin/ops/release-stubs
+   M code/HELLO.txt
+   M docs/TASKS.md
+   M modules/atlas/plans/plan.json
+   M modules/diagno/reports/report.json
+  ?? out/
+  ?? scripts/lib.sh
+  ?? scripts/lint-scripts.sh
+  ?? scripts/trihelix-repo-audit.sh
+  ?? scripts/trihelix-smoke.sh
+  ?? trihelix-merge-now.sh
++ hr
++ _log_write '────────────────────────────────────\n'
++ printf %b '────────────────────────────────────\n'
+────────────────────────────────────
++ '[' -n /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/out/audit.txt ']'
++ printf %b '────────────────────────────────────\n'
++ _strip_ansi
++ sed -E 's/\x1b\[[0-9;]*m//g'
++ section 'rebase / stash'
++ _log_write '== rebase / stash ==\n'
++ printf %b '== rebase / stash ==\n'
+== rebase / stash ==
++ '[' -n /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/out/audit.txt ']'
++ printf %b '== rebase / stash ==\n'
++ _strip_ansi
++ sed -E 's/\x1b\[[0-9;]*m//g'
++ '[' -d /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/.git/rebase-merge ']'
++ '[' -d /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/.git/rebase-apply ']'
++ ok 'rebase yoxdur'
++ _log_write '✓ rebase yoxdur\n'
++ printf %b '✓ rebase yoxdur\n'
+✓ rebase yoxdur
++ '[' -n /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/out/audit.txt ']'
++ printf %b '✓ rebase yoxdur\n'
++ _strip_ansi
++ sed -E 's/\x1b\[[0-9;]*m//g'
++ git stash list
++ sed 's/^/  /'
+  stash@{0}: On (no branch): wip: save before clean rebuild
+  stash@{1}: On ops/release-stubs: wip:auto-stash before trihelix-fix-ops-safe
+  stash@{2}: On (no branch): temp during rebase
+  stash@{3}: On (no branch): temp during rebase
+  stash@{4}: On ops/release-stubs: wip: conflict-resolve for PR#3
+  stash@{5}: On ops/release-stubs: wip: rebase ops/release-stubs
+  stash@{6}: On fix/release-hardening: wip: local runtime files
++ hr
++ _log_write '────────────────────────────────────\n'
++ printf %b '────────────────────────────────────\n'
+────────────────────────────────────
++ '[' -n /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/out/audit.txt ']'
++ printf %b '────────────────────────────────────\n'
++ _strip_ansi
++ sed -E 's/\x1b\[[0-9;]*m//g'
++ section CI/workflows
++ _log_write '== CI/workflows ==\n'
++ printf %b '== CI/workflows ==\n'
+== CI/workflows ==
++ '[' -n /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/out/audit.txt ']'
++ printf %b '== CI/workflows ==\n'
++ _strip_ansi
++ sed -E 's/\x1b\[[0-9;]*m//g'
++ '[' -f /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/.github/workflows/release.yml ']'
++ ok '.github/workflows/release.yml var'
++ _log_write '✓ .github/workflows/release.yml var\n'
++ printf %b '✓ .github/workflows/release.yml var\n'
+✓ .github/workflows/release.yml var
++ '[' -n /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/out/audit.txt ']'
++ printf %b '✓ .github/workflows/release.yml var\n'
++ _strip_ansi
++ sed -E 's/\x1b\[[0-9;]*m//g'
++ hr
++ _log_write '────────────────────────────────────\n'
++ printf %b '────────────────────────────────────\n'
+────────────────────────────────────
++ '[' -n /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/out/audit.txt ']'
++ printf %b '────────────────────────────────────\n'
++ _strip_ansi
++ sed -E 's/\x1b\[[0-9;]*m//g'
++ section 'docs stubs'
++ _log_write '== docs stubs ==\n'
++ printf %b '== docs stubs ==\n'
+== docs stubs ==
++ '[' -n /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/out/audit.txt ']'
++ printf %b '== docs stubs ==\n'
++ _strip_ansi
++ sed -E 's/\x1b\[[0-9;]*m//g'
++ for f in docs/RELEASE_NOTES.md docs/CHANGELOG.md
++ '[' -f /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/docs/RELEASE_NOTES.md ']'
++ ok docs/RELEASE_NOTES.md
++ _log_write '✓ docs/RELEASE_NOTES.md\n'
++ printf %b '✓ docs/RELEASE_NOTES.md\n'
+✓ docs/RELEASE_NOTES.md
++ '[' -n /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/out/audit.txt ']'
++ printf %b '✓ docs/RELEASE_NOTES.md\n'
++ _strip_ansi
++ sed -E 's/\x1b\[[0-9;]*m//g'
++ for f in docs/RELEASE_NOTES.md docs/CHANGELOG.md
++ '[' -f /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/docs/CHANGELOG.md ']'
++ ok docs/CHANGELOG.md
++ _log_write '✓ docs/CHANGELOG.md\n'
++ printf %b '✓ docs/CHANGELOG.md\n'
+✓ docs/CHANGELOG.md
++ '[' -n /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/out/audit.txt ']'
++ printf %b '✓ docs/CHANGELOG.md\n'
++ _strip_ansi
++ sed -E 's/\x1b\[[0-9;]*m//g'
++ hr
++ _log_write '────────────────────────────────────\n'
++ printf %b '────────────────────────────────────\n'
+────────────────────────────────────
++ '[' -n /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/out/audit.txt ']'
++ printf %b '────────────────────────────────────\n'
++ _strip_ansi
++ sed -E 's/\x1b\[[0-9;]*m//g'
++ section 'large files (>5MB)'
++ _log_write '== large files (>5MB) ==\n'
++ printf %b '== large files (>5MB) ==\n'
+== large files (>5MB) ==
++ '[' -n /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/out/audit.txt ']'
++ printf %b '== large files (>5MB) ==\n'
++ _strip_ansi
++ sed -E 's/\x1b\[[0-9;]*m//g'
++ find /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix -type f -size +5M -not -path '*/.git/*' -not -path '*/.helix/*' -not -path '*/modules/*/out/*' -print
++ sed 's/^/  /'
++ hr
++ _log_write '────────────────────────────────────\n'
++ printf %b '────────────────────────────────────\n'
+────────────────────────────────────
++ '[' -n /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/out/audit.txt ']'
++ printf %b '────────────────────────────────────\n'
++ _strip_ansi
++ sed -E 's/\x1b\[[0-9;]*m//g'
++ section 'simple secret scan'
++ _log_write '== simple secret scan ==\n'
++ printf %b '== simple secret scan ==\n'
+== simple secret scan ==
++ '[' -n /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/out/audit.txt ']'
++ printf %b '== simple secret scan ==\n'
++ _strip_ansi
++ sed -E 's/\x1b\[[0-9;]*m//g'
++ sed 's/^/  /'
++ grep -R --line-number -E '(ghp_[A-Za-z0-9]{36,}|AWS_(SECRET|ACCESS)|-----BEGIN (RSA|EC) PRIVATE KEY-----)' /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix
++ info '(tapılmadı)'
++ _log_write '• (tapılmadı)\n'
++ printf %b '• (tapılmadı)\n'
+• (tapılmadı)
++ '[' -n /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/out/audit.txt ']'
++ _strip_ansi
++ printf %b '• (tapılmadı)\n'
++ sed -E 's/\x1b\[[0-9;]*m//g'
++ hr
++ _log_write '────────────────────────────────────\n'
++ printf %b '────────────────────────────────────\n'
+────────────────────────────────────
++ '[' -n /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/out/audit.txt ']'
++ printf %b '────────────────────────────────────\n'
++ _strip_ansi
++ sed -E 's/\x1b\[[0-9;]*m//g'
++ section 'branch protection (token olarsa)'
++ _log_write '== branch protection (token olarsa) ==\n'
++ printf %b '== branch protection (token olarsa) ==\n'
+== branch protection (token olarsa) ==
++ '[' -n /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/out/audit.txt ']'
++ printf %b '== branch protection (token olarsa) ==\n'
++ _strip_ansi
++ sed -E 's/\x1b\[[0-9;]*m//g'
++ '[' -n '' ']'
++ info '(skip: token və ya curl/jq yoxdur)'
++ _log_write '• (skip: token və ya curl/jq yoxdur)\n'
++ printf %b '• (skip: token və ya curl/jq yoxdur)\n'
+• (skip: token və ya curl/jq yoxdur)
++ '[' -n /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/out/audit.txt ']'
++ printf %b '• (skip: token və ya curl/jq yoxdur)\n'
++ _strip_ansi
++ sed -E 's/\x1b\[[0-9;]*m//g'
++ hr
++ _log_write '────────────────────────────────────\n'
++ printf %b '────────────────────────────────────\n'
+────────────────────────────────────
++ '[' -n /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/out/audit.txt ']'
++ _strip_ansi
++ printf %b '────────────────────────────────────\n'
++ sed -E 's/\x1b\[[0-9;]*m//g'
++ ok 'Audit tamamlandı → /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/out/audit.txt'
++ _log_write '✓ Audit tamamlandı → /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/out/audit.txt\n'
++ printf %b '✓ Audit tamamlandı → /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/out/audit.txt\n'
+✓ Audit tamamlandı → /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/out/audit.txt
++ '[' -n /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/out/audit.txt ']'
++ printf %b '✓ Audit tamamlandı → /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/out/audit.txt\n'
++ _strip_ansi
++ sed -E 's/\x1b\[[0-9;]*m//g'
++ restore_tty
+(B[m

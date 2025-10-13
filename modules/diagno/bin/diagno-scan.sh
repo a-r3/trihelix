@@ -1,12 +1,19 @@
 #!/usr/bin/env bash
 set -euo pipefail
-OUT_DIR="modules/diagno/out"; REPORT_DIR="modules/diagno/reports"
-mkdir -p "$OUT_DIR" "$REPORT_DIR"
+source scripts/safe-mode.sh
+
+OUT="modules/diagno/out/insights.json"
+REP="modules/diagno/reports/report.json"
+mkdir -p "$(dirname "$OUT")" "$(dirname "$REP")"
+
 ts=$(date -Iseconds)
-cat > "$OUT_DIR/insights.json" <<JSON
+cat > "$OUT" <<JSON
 {"ts":"$ts","risk":"low","quick_wins":["keep logs append-only"],"strategic":["introduce module tests"]}
 JSON
-cat > "$REPORT_DIR/report.json" <<JSON
-{"ts":"$ts","status":"ok","details":"stub health check"}
+
+cat > "$REP" <<JSON
+{"status":"ok","ts":"$ts"}
 JSON
-echo "🩺 Diagno: wrote insights → $OUT_DIR/insights.json and $REPORT_DIR/report.json"
+
+echo "✅ Diagno: wrote insights → $OUT and report → $REP"
+[ "${SAFE_MODE}" = "1" ] && echo "🛡️  (Safe Mode: meta-only write allowed)"

@@ -1,0 +1,24 @@
+== TriHelix Repo Audit @ 2025-10-09T04:06:29+0400 ==
+• root: /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix
+────────────────────────────────────
+== git status ==
+────────────────────────────────────
+== rebase / stash ==
+✓ rebase yoxdur
+────────────────────────────────────
+== CI/workflows ==
+✓ .github/workflows/release.yml var
+────────────────────────────────────
+== docs stubs ==
+✓ docs/RELEASE_NOTES.md
+✓ docs/CHANGELOG.md
+────────────────────────────────────
+== large files (>5MB) ==
+────────────────────────────────────
+== simple secret scan ==
+• (tapılmadı)
+────────────────────────────────────
+== branch protection (token olarsa) ==
+• (skip: token və ya curl/jq yoxdur)
+────────────────────────────────────
+✓ Audit tamamlandı → /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/out/audit.txt

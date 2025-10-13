@@ -1,19 +1,115 @@
-name: trihelix-ci
+name: trihelix-release
 
 on:
-  push:
-    branches: [ main ]
   workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to release (e.g., v1.0.1)'
+        required: true
+  push:
+    tags:
+      - 'v*.*.*'
 
 permissions:
   contents: write
   pull-requests: write
 
+concurrency:
+  group: trihelix-ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  loop-and-commit:
+  loop-and-validate:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          ref: main
+
+      - name: Install deps (jq, python3)
+        run: sudo apt-get update && sudo apt-get install -y jq python3
+
+      - name: Ensure exec bits
+        run: |
+          chmod +x scripts/*.sh || true
+          chmod +x modules/*/bin/*.sh || true
+
+      # ---- Core loop (atlas → genom → diagno → health/insights/decision/guided-fix → telemetry → metrics → gate)
+      - name: Run synchronized loop
+        run: bash scripts/loop-run.sync.sh
+
+      - name: Self-Heal + Snapshot
+        run: |
+          bash scripts/self-heal.sh
+          bash scripts/snapshot-write.sh
+
+      # Health Gate (85 on main, 75 otherwise)
+      - name: Health Gate
+        run: |
+          MIN=$([ "${GITHUB_REF_NAME}" = "main" ] && echo 85 || echo 75)
+          echo "Using MIN_HEALTH=$MIN on ${GITHUB_REF_NAME}"
+          MIN_HEALTH="$MIN" bash scripts/health-gate.sh
+
+      - name: Policy Guard
+        run: bash scripts/policy-guard.sh
+
+      - name: Lint Gate
+        run: bash scripts/lint-gate.sh
+
+      - name: Coverage Gate
+        env:
+          MIN_COVERAGE: "60"
+          COVERAGE_FILE: "coverage/summary.txt"
+        run: bash scripts/coverage-gate.sh
+
+      - name: Evolution Baseline
+        run: bash scripts/evolution-guard.sh
+
+      # ---- Commit any changes (logs/metrics/roadmap/notes/tasks) and open PR
+      - name: Prepare changes
+        id: prep
+        run: |
+          git config user.name "helix-bot"
+          git config user.email "helix-bot@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "CHANGES=false" >> $GITHUB_ENV
+            echo "No changes to commit."
+          else
+            git commit -m "chore(ci): loop telemetry & docs update"
+            echo "CHANGES=true" >> $GITHUB_ENV
+          fi
+
+      - name: Create Pull Request
+        if: env.CHANGES == 'true'
+        uses: peter-evans/create-pull-request@v6
+        with:
+          commit-message: "chore(ci): loop telemetry & docs update"
+          title: "Helix Bot: update telemetry & docs"
+          body: |
+            Automated update by Helix loop.
+            Includes telemetry logs, metrics, insights, roadmap/task deltas and snapshots.
+          branch: bot/helix-update
+          delete-branch: true
+          labels: bot, helix, automated
+
+      - name: EP → Tasks auto-import
+        run: bash scripts/ep-import.sh
+
+
+      # ---- Optional notification (set NOTIFY_WEBHOOK secret to enable)
+      - name: Notify webhook (optional)
+        if: always()
+        env:
+          NOTIFY_WEBHOOK: ${{ secrets.NOTIFY_WEBHOOK }}
+        run: |
+          chmod +x scripts/notify-webhook.sh || true
+          scripts/notify-webhook.sh "ci.complete" '{"status":"done","ref":"'"${GITHUB_REF_NAME}"'"}' || true
+
+# .github/workflows/trihelix-ci.yml
+env:
+  SAFE_MODE: "1"
+
+

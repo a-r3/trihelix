@@ -1,7 +1,7 @@
 project: TriHelix
 project: TriHelix
-version: 1.2.0
-version: 1.2.0
+version: 1.0.1
+version: 1.0.1
 purpose: >
 purpose: >
   Build an AI‑native TriHelix where Atlas (plan), Genom (create), Diagno (analyze)
@@ -9,11 +9,9 @@ purpose: >
   are orchestrated by Helix to form a self‑adapting development loop.
   are orchestrated by Helix to form a self‑adapting development loop.
 current_phase:
-  name: Conductor
-  range: 40-60
-  focus: "Full loop engine: health scoring, policy guard, adaptive roadmap"
-  focus: "Scaffold, context, memory, and first loop prototype"
-    focus: "Full loop engine: health scoring, policy guard, adaptive roadmap"
+  name: CognitiveCore
+  range: 60-80
+  focus: "Insight engine, decision model, self-correction"
 ai_operating_rules:
 ai_operating_rules:
   - Always load CONTEXT.yaml before reasoning.
@@ -38,4 +36,6 @@ last_updated: 2025-10-08
 last_updated: 2025-10-08
 maintainer: "Helix AI Agent"
 maintainer: "Helix AI Agent"
+awk 'END{print "project_track:\n  enabled: true\n  source: docs/PROJECT_ROADMAP.md\n  name: MyProject"}' CONTEXT.yaml >> CONTEXT.yaml
+
 

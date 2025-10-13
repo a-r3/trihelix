@@ -1,3 +1,7 @@
+
+- Initial auto notes placeholder.
+- Add highlights for this release here.
+
 # TriHelix Release Notes — 2025-10-08T09:57:20.060676
 
 ## Summary
@@ -37,4 +41,4 @@
 - Goal: extend module tests
 - Goal: raise coverage threshold +5%
 - Goal: tighten policy guard
-```
+``

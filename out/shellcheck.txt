@@ -1,0 +1,4 @@
+== Shell Lint Report (2025-10-09T03:55:52+0400) ==
+• Fayllar: 25
+────────────────────────────────────
+✓ modules/atlas/bin/atlas-plan.sh

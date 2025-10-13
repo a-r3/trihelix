@@ -1,0 +1,75 @@
++ set -Eeuo pipefail
+++ git rev-parse --show-toplevel
++ ROOT=/home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix
++ OUT=/home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/out
++ mkdir -p /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/out
++ . /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/scripts/lib.sh
+++ set -Eeuo pipefail
+++ trap restore_tty EXIT
+++ _use_color
+++ '[' -t 1 ']'
+++ return 1
+++ BOLD=
+++ DIM=
+++ RESET=
+++ RED=
+++ GREEN=
+++ YELLOW=
+++ BLUE=
+++ LOG_FILE=
++ TXT=/home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/out/shellcheck.txt
++ MD=/home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/out/shellcheck.md
++ log_init /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/out/shellcheck.txt
++ LOG_FILE=/home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/out/shellcheck.txt
++ :
++ :
+++ date +%Y-%m-%dT%H:%M:%S%z
++ section 'Shell Lint Report (2025-10-09T03:55:52+0400)'
++ _log_write '== Shell Lint Report (2025-10-09T03:55:52+0400) ==\n'
++ printf %b '== Shell Lint Report (2025-10-09T03:55:52+0400) ==\n'
+== Shell Lint Report (2025-10-09T03:55:52+0400) ==
++ '[' -n /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/out/shellcheck.txt ']'
++ printf %b '== Shell Lint Report (2025-10-09T03:55:52+0400) ==\n'
++ _strip_ansi
++ sed -E 's/\x1b\[[0-9;]*m//g'
++ command -v shellcheck
++ mapfile -t FILES
+++ git ls-files 'scripts/*.sh' 'modules/*/bin/*.sh'
++ '[' 25 -eq 0 ']'
++ '[' 25 -eq 0 ']'
++ info 'Fayllar: 25'
++ _log_write '• Fayllar: 25\n'
++ printf %b '• Fayllar: 25\n'
+• Fayllar: 25
++ '[' -n /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/out/shellcheck.txt ']'
++ printf %b '• Fayllar: 25\n'
++ _strip_ansi
++ sed -E 's/\x1b\[[0-9;]*m//g'
++ hr
++ _log_write '────────────────────────────────────\n'
++ printf %b '────────────────────────────────────\n'
+────────────────────────────────────
++ '[' -n /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/out/shellcheck.txt ']'
++ printf %b '────────────────────────────────────\n'
++ _strip_ansi
++ sed -E 's/\x1b\[[0-9;]*m//g'
++ total=0
++ bad=0
++ printf '# Shell Lint Report\n\n'
++ for f in "${FILES[@]}"
+++ shellcheck -f gcc modules/atlas/bin/atlas-plan.sh
++ out=
++ '[' -n '' ']'
++ ok modules/atlas/bin/atlas-plan.sh
++ _log_write '✓ modules/atlas/bin/atlas-plan.sh\n'
++ printf %b '✓ modules/atlas/bin/atlas-plan.sh\n'
+✓ modules/atlas/bin/atlas-plan.sh
++ '[' -n /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/out/shellcheck.txt ']'
++ _strip_ansi
++ printf %b '✓ modules/atlas/bin/atlas-plan.sh\n'
++ sed -E 's/\x1b\[[0-9;]*m//g'
++ printf '- [x] %s\n' modules/atlas/bin/atlas-plan.sh
+scripts/lint-scripts.sh: line 46: printf: - : invalid option
+printf: usage: printf [-v var] format [arguments]
++ restore_tty
+(B[m

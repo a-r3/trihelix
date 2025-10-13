@@ -1,1 +1,8 @@
-{"ts":"2025-10-08T08:10:53+04:00","status":"ok","details":"stub health check"}
+{
+  "status": "ok",
+  "ts": "2025-10-13T12:49:38+04:00",
+  "phase_coverage": {
+    "open": 3,
+    "done": 0
+  }
+}

@@ -1,6 +1,0 @@
-id: genom-creator
-role: "Code Generator & Refactor"
-inputs: ["Atlas plan delta"]
-outputs: ["Code modules", "CI scaffolds"]
-rules:
-  - Idempotent writes; preview/dry‑run friendly

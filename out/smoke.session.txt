@@ -1,0 +1,142 @@
+Script started on 2025-10-09 03:54:13+04:00 [COMMAND="bash -x scripts/trihelix-smoke.sh" TERM="xterm-256color" TTY="/dev/pts/0" COLUMNS="80" LINES="24"]
++ set -Eeuo pipefail
++ export GH_PAGER=cat
++ GH_PAGER=cat
++ export PAGER=cat
++ PAGER=cat
++ export CLICOLOR_FORCE=0
++ CLICOLOR_FORCE=0
++ export TERM=xterm-256color
++ TERM=xterm-256color
+++ git rev-parse --show-toplevel
++ ROOT=/home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix
++ OUT=/home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/out
++ mkdir -p /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/out
++ INV_TXT=/home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/out/inventory.txt
++ INV_MD=/home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/out/inventory.md
++ . /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/scripts/lib.sh
+++ set -Eeuo pipefail
+++ _use_color
+++ '[' -t 1 ']'
+++ command -v tput
+++ tput setaf 2
+++ return 0
++++ tput bold
+++ BOLD='[1m'
++++ tput dim
+++ DIM='[2m'
++++ tput sgr0
+++ RESET='(B[m'
++++ tput setaf 1
+++ RED='[31m'
++++ tput setaf 2
+++ GREEN='[32m'
++++ tput setaf 3
+++ YELLOW='[33m'
++++ tput setaf 4
+++ BLUE='[34m'
+++ LOG_FILE=
++ log_init /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/out/inventory.txt
++ LOG_FILE=/home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/out/inventory.txt
++ :
++ :
+++ date +%Y-%m-%dT%H:%M:%S%z
++ section 'TriHelix Smoke (2025-10-09T03:54:13+0400)'
++ _log_write '[1m== TriHelix Smoke (2025-10-09T03:54:13+0400) ==(B[m\n'
++ printf %b '[1m== TriHelix Smoke (2025-10-09T03:54:13+0400) ==(B[m\n'
+[1m== TriHelix Smoke (2025-10-09T03:54:13+0400) ==(B[m
++ '[' -n /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/out/inventory.txt ']'
++ printf %b '[1m== TriHelix Smoke (2025-10-09T03:54:13+0400) ==(B[m\n'
++ sed -E 's/\x1b\[[0-9;]*m//g'
++ ok_files=1
++ for f in ".github/workflows/release.yml" "docs/RELEASE_NOTES.md" "docs/CHANGELOG.md"
++ '[' -f /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/.github/workflows/release.yml ']'
++ ok .github/workflows/release.yml
++ _log_write '[32m✓(B[m .github/workflows/release.yml\n'
++ printf %b '[32m✓(B[m .github/workflows/release.yml\n'
+[32m✓(B[m .github/workflows/release.yml
++ '[' -n /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/out/inventory.txt ']'
++ printf %b '[32m✓(B[m .github/workflows/release.yml\n'
++ sed -E 's/\x1b\[[0-9;]*m//g'
++ echo '- [x] .github/workflows/release.yml'
++ for f in ".github/workflows/release.yml" "docs/RELEASE_NOTES.md" "docs/CHANGELOG.md"
++ '[' -f /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/docs/RELEASE_NOTES.md ']'
++ ok docs/RELEASE_NOTES.md
++ _log_write '[32m✓(B[m docs/RELEASE_NOTES.md\n'
++ printf %b '[32m✓(B[m docs/RELEASE_NOTES.md\n'
+[32m✓(B[m docs/RELEASE_NOTES.md
++ '[' -n /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/out/inventory.txt ']'
++ printf %b '[32m✓(B[m docs/RELEASE_NOTES.md\n'
++ sed -E 's/\x1b\[[0-9;]*m//g'
++ echo '- [x] docs/RELEASE_NOTES.md'
++ for f in ".github/workflows/release.yml" "docs/RELEASE_NOTES.md" "docs/CHANGELOG.md"
++ '[' -f /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/docs/CHANGELOG.md ']'
++ ok docs/CHANGELOG.md
++ _log_write '[32m✓(B[m docs/CHANGELOG.md\n'
++ printf %b '[32m✓(B[m docs/CHANGELOG.md\n'
+[32m✓(B[m docs/CHANGELOG.md
++ '[' -n /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/out/inventory.txt ']'
++ printf %b '[32m✓(B[m docs/CHANGELOG.md\n'
++ sed -E 's/\x1b\[[0-9;]*m//g'
++ echo '- [x] docs/CHANGELOG.md'
++ hr
++ _log_write '[2m────────────────────────────────────(B[m\n'
++ printf %b '[2m────────────────────────────────────(B[m\n'
+[2m────────────────────────────────────(B[m
++ '[' -n /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/out/inventory.txt ']'
++ printf %b '[2m────────────────────────────────────(B[m\n'
++ sed -E 's/\x1b\[[0-9;]*m//g'
++ ver=
++ '[' -f /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/CONTEXT.yaml ']'
+++ awk '/^version:/{print $2;exit}' /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/CONTEXT.yaml
++ ver=1.2.0
++ '[' -n 1.2.0 ']'
++ ok 'CONTEXT.yaml version: 1.2.0'
++ _log_write '[32m✓(B[m CONTEXT.yaml version: 1.2.0\n'
++ printf %b '[32m✓(B[m CONTEXT.yaml version: 1.2.0\n'
+[32m✓(B[m CONTEXT.yaml version: 1.2.0
++ '[' -n /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/out/inventory.txt ']'
++ printf %b '[32m✓(B[m CONTEXT.yaml version: 1.2.0\n'
++ sed -E 's/\x1b\[[0-9;]*m//g'
++ printf '\nVersion: `%s`\n' 1.2.0
++ hr
++ _log_write '[2m────────────────────────────────────(B[m\n'
++ printf %b '[2m────────────────────────────────────(B[m\n'
+[2m────────────────────────────────────(B[m
++ '[' -n /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/out/inventory.txt ']'
++ printf %b '[2m────────────────────────────────────(B[m\n'
++ sed -E 's/\x1b\[[0-9;]*m//g'
++ command -v gh
++ gh workflow view release.yml
++ ok 'GitHub workflow release.yml əlçatandır (gh)'
++ _log_write '[32m✓(B[m GitHub workflow release.yml əlçatandır (gh)\n'
++ printf %b '[32m✓(B[m GitHub workflow release.yml əlçatandır (gh)\n'
+[32m✓(B[m GitHub workflow release.yml əlçatandır (gh)
++ '[' -n /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/out/inventory.txt ']'
++ printf %b '[32m✓(B[m GitHub workflow release.yml əlçatandır (gh)\n'
++ sed -E 's/\x1b\[[0-9;]*m//g'
++ hr
++ _log_write '[2m────────────────────────────────────(B[m\n'
++ printf %b '[2m────────────────────────────────────(B[m\n'
+[2m────────────────────────────────────(B[m
++ '[' -n /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/out/inventory.txt ']'
++ printf %b '[2m────────────────────────────────────(B[m\n'
++ sed -E 's/\x1b\[[0-9;]*m//g'
++ '[' 1 -eq 1 ']'
++ ok 'Smoke: PASS'
++ _log_write '[32m✓(B[m Smoke: PASS\n'
++ printf %b '[32m✓(B[m Smoke: PASS\n'
+[32m✓(B[m Smoke: PASS
++ '[' -n /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/out/inventory.txt ']'
++ printf %b '[32m✓(B[m Smoke: PASS\n'
++ sed -E 's/\x1b\[[0-9;]*m//g'
++ printf '\nResult: ✅ PASS\n'
++ info 'Detallar: /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/out/inventory.txt, /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/out/inventory.md'
++ _log_write '• Detallar: /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/out/inventory.txt, /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/out/inventory.md\n'
++ printf %b '• Detallar: /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/out/inventory.txt, /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/out/inventory.md\n'
+• Detallar: /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/out/inventory.txt, /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/out/inventory.md
++ '[' -n /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/out/inventory.txt ']'
++ printf %b '• Detallar: /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/out/inventory.txt, /home/oem/Documents/Projects/PersonalUse/Tools/TriHelix/trihelix/out/inventory.md\n'
++ sed -E 's/\x1b\[[0-9;]*m//g'
+
+Script done on 2025-10-09 03:54:14+04:00 [COMMAND_EXIT_CODE="0"]
