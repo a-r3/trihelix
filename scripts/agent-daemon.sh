@@ -1,27 +1,29 @@
 #!/usr/bin/env bash
 set -euo pipefail
+
 CMD="${1:-}"
 PIDF=".helix/agent.pid"
 LOGF=".helix/logs/agent-$(date +%Y%m%d).log"
-INTERVAL="${INTERVAL:-120}"  # seconds between loops
+INTERVAL="${INTERVAL:-120}"  # seconds
 
 start_agent() {
   if [ -f "$PIDF" ] && kill -0 "$(cat "$PIDF")" 2>/dev/null; then
     echo "ℹ️  Agent already running (pid=$(cat "$PIDF"))."; return 0
   fi
   mkdir -p .helix/logs
-  nohup bash -c '
-    trap "echo Stopping agent; exit 0" INT TERM
+  # Double-quoted here-doc style block to avoid SC2016 notes
+  nohup bash -c "
+    trap 'echo Stopping agent; exit 0' INT TERM
     while true; do
-      echo "$(date -Iseconds) :: agent tick" | tee -a "'"$LOGF"'"
-      if bash scripts/loop-run.sync.sh >> "'"$LOGF"'" 2>&1; then
-        echo "$(date -Iseconds) :: loop ok" | tee -a "'"$LOGF"'"
+      echo \"\$(date -Iseconds) :: agent tick\" | tee -a \"$LOGF\"
+      if bash scripts/loop-run.sync.sh >> \"$LOGF\" 2>&1; then
+        echo \"\$(date -Iseconds) :: loop ok\" | tee -a \"$LOGF\"
       else
-        echo "$(date -Iseconds) :: loop failed" | tee -a "'"$LOGF"'"
+        echo \"\$(date -Iseconds) :: loop failed\" | tee -a \"$LOGF\"
       fi
-      sleep "'"$INTERVAL"'"
+      sleep \"$INTERVAL\"
     done
-  ' >/dev/null 2>&1 &
+  " >/dev/null 2>&1 &
   echo $! > "$PIDF"
   echo "✅ Agent started (pid=$(cat "$PIDF"), interval=${INTERVAL}s). Logs → $LOGF"
 }

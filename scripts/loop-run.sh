@@ -1,47 +1,105 @@
 #!/usr/bin/env bash
-set -e
+# TriHelix — Telemetry Loop (stub, stable)
+set -euo pipefail
+
+STATE_FILE=".helix/state.json"
+LOGS_DIR=".helix/logs"
+MEM_FILE="MEMORY.md"
+SNAP_SCRIPT="scripts/snapshot-write.sh"
+
+mkdir -p ".helix/memory" "$LOGS_DIR"
+
+# Phase/Range from CONTEXT.yaml (fallbacks)
+PHASE="$(awk '/^current_phase:/{f=1;next} f && /name:/{print $2; exit}' CONTEXT.yaml 2>/dev/null || true)"
+PHASE="${PHASE:-Genesis}"
+RANGE="$(awk '/^current_phase:/{f=1;next} f && /range:/{print $2; exit}' CONTEXT.yaml 2>/dev/null || true)"
+RANGE="${RANGE:-0-20}"
+
 echo "🔁 TriHelix Loop — Plan→Build→Analyze"
-start_ts=$(date -Iseconds)
-state_file=".helix/state.json"
-logs_dir=".helix/logs"; mkdir -p "$logs_dir"
-log="$logs_dir/loop-$(date +%Y%m%d-%H%M%S).json"
-
-# Simulated steps (replace with real calls)
 echo "• Atlas: planning…"
-sleep 0.2
 echo "• Genom: generating…"
-sleep 0.2
 echo "• Diagno: analyzing…"
-sleep 0.2
 
-finish_ts=$(date -Iseconds)
-# Update state
-python3 - "$state_file" "$log" "$start_ts" "$finish_ts" <<'PY'
-import json, sys
-state_path, log_path, s, f = sys.argv[1:5]
-with open(state_path) as r: st=json.load(r)
-st["iteration"]=int(st.get("iteration",0))+1
-st["last_loop"]={"status":"ok","started_at":s,"finished_at":f,"artifacts":{"log":log_path}}
-with open(state_path,"w") as w: json.dump(st,w,indent=2)
-with open(log_path,"w") as w: json.dump(st["last_loop"],w,indent=2)
-print("State updated:", state_path)
+START_TS="$(date -Iseconds)"
+LOG_FILE="$LOGS_DIR/loop-$(date +%Y%m%d-%H%M%S).json"
+
+# 1) Previous iteration
+ITER_PREV=$(python3 - <<'PY'
+import json, os, sys
+p=".helix/state.json"
+it=0
+if os.path.exists(p):
+  try: it=int(json.load(open(p)).get("iteration",0))
+  except Exception: it=0
+print(it)
+PY
+)
+
+# 2) Write loop log
+python3 - <<PY
+import json, datetime, sys
+log_path = "${LOG_FILE}"
+payload = {
+  "status":"ok",
+  "started_at":"${START_TS}",
+  "finished_at": datetime.datetime.now().isoformat(),
+  "artifacts": {}
+}
+with open(log_path,"w") as f: json.dump(payload,f,indent=2)
 print("Log written:", log_path)
 PY
 
-# Memory summary
-echo -e "\n## Iteration: Genesis/0-20 @ $(date -Iseconds)\n- Atlas: plan stub\n- Genom: generate stub\n- Diagno: analyze stub\n- Helix: state/log updated\n- Next: replace stubs with real calls\n" >> MEMORY.md
+# 3) Update state.json
+python3 - <<PY
+import json, os
+state_path = "${STATE_FILE}"
+iter_prev = int("${ITER_PREV}")
+log = json.load(open("${LOG_FILE}"))
+state = {
+  "phase": "${PHASE}",
+  "iteration": iter_prev + 1,
+  "last_loop": {
+    "status": log.get("status","ok"),
+    "started_at": log.get("started_at"),
+    "finished_at": log.get("finished_at"),
+    "artifacts": log.get("artifacts",{})
+  }
+}
+os.makedirs(os.path.dirname(state_path), exist_ok=True)
+json.dump(state, open(state_path,"w"), indent=2)
+print("State updated:", state_path)
+PY
 
-# Snapshot
-python3 - <<'PY'
-import json, datetime
+# 4) Human-readable memory
+{
+  echo
+  echo "## Iteration: ${PHASE}/${RANGE} @ $(date -Iseconds)"
+  echo "- Atlas: plan stub"
+  echo "- Genom: generate stub"
+  echo "- Diagno: analyze stub"
+  echo "- Helix: state/log updated"
+  echo "- Next: replace stubs with real calls"
+  echo
+} >> "$MEM_FILE"
+
+# 5) Snapshot (idempotent)
+if [ -x "$SNAP_SCRIPT" ]; then
+  bash "$SNAP_SCRIPT"
+else
+  python3 - <<'PY'
+import json, datetime, os
+os.makedirs(".helix/memory", exist_ok=True)
 snap = {
   "project":"TriHelix",
-  "phase":"Genesis",
-  "range":"0-20",
+  "phase":"unknown",
+  "range":"unknown",
   "last_update": datetime.date.today().isoformat(),
-  "notes":["Loop executed (stub)"]
+  "notes":["Loop executed (fallback snapshot)"]
 }
-open(".helix/memory/trihelix.snapshot.json","w").write(json.dumps(snap,indent=2))
-print("📸 Snapshot updated")
+json.dump(snap, open(".helix/memory/trihelix.snapshot.json","w"), indent=2)
+print("📸 Snapshot updated (fallback)")
 PY
+fi
+
 echo "✅ Loop complete"
+
