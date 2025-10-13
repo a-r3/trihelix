@@ -1,0 +1,6 @@
+{
+  "ts": "2025-10-13T10:22:44+04:00",
+  "sprint": "S-20251013",
+  "goals": ["sync bus prototype", "scheduler online", "metrics collector"],
+  "artifacts": ["docs/METRICS.md", ".helix/metrics.json"]
+}
